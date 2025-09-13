@@ -6,45 +6,47 @@ from pathlib import Path
 import pandas as pd
 from dotenv import load_dotenv
 
-from constants import (
+from expense import (
     AMOUNT_COLUMN,
-    CURRENCY,
-    EXAMPLE_STR,
+    DEFAULT_CURRENCY,
+    DEFAULT_DESCRIPTION,
     EXPENSE_CATEGORIES,
-    EXPENSE_DF_COLUMNS,
     PATH_TO_EXPENSE_FILES,
+    Expense,
 )
 
 
 def calculate_amount_left(expense_df: pd.DataFrame):
     load_dotenv()
     income = float(os.environ["INCOME"])
-    total_amount_expended = float(expense_df[AMOUNT_COLUMN].sum())
+    total_amount_expended = expense_df[AMOUNT_COLUMN].astype(float).sum()
     amount_left = income - total_amount_expended
-    print(f"\n==> You have {CURRENCY} {amount_left:.2f} left.\n")
+    print(f"\n==> You have {DEFAULT_CURRENCY} {amount_left:.2f} left.\n")
 
 
 def update_expense(
     expense_filepath: Path,
     name: str,
     category: str,
-    amount: float,
+    amount: str,
+    currency: str,
     description: str,
     date: str,
 ) -> pd.DataFrame:
-    args_list = [name, category, amount, description, date]
+    expense_obj = Expense(
+        name=name,
+        category=category,
+        amount=amount,
+        currency=currency,
+        description=description,
+        date=date,
+    )
     if os.path.exists(expense_filepath):
         expense_df = pd.read_csv(expense_filepath)
-        new_expense_row = pd.DataFrame(
-            [args_list],
-            columns=expense_df.columns,
-        )
+        new_expense_row = expense_obj.get_df()
         expense_df = pd.concat([expense_df, new_expense_row], ignore_index=True)
     else:
-        expense_df = pd.DataFrame(
-            [args_list],
-            columns=EXPENSE_DF_COLUMNS,
-        )
+        expense_df = expense_obj.get_df()
     expense_df.to_csv(expense_filepath, index=False)
     print(expense_df)
     print(f"\nExpense added successfully to {expense_filepath}")
@@ -63,9 +65,12 @@ def main():
     expense_filepath = PATH_TO_EXPENSE_FILES / expense_filename
 
     # Create parser
+    example_str = (
+        "usage example: uv run main.py -n popcorn -c FOOD -a 3.25 -d 'some_description'"
+    )
     expense_parser = argparse.ArgumentParser(
         prog="uv run main.py",
-        description=f"{EXAMPLE_STR}\n\nAdd expenses to the {expense_filename} file.",
+        description=f"{example_str}\n\nAdd expenses to the {expense_filename} file.",
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     expense_parser.add_argument(
@@ -73,7 +78,7 @@ def main():
         "--name",
         required=True,
         type=str,
-        help="The name of the expense. Need to be a string.",
+        help="The name of the expense.",
     )
     expense_parser.add_argument(
         "-c",
@@ -88,14 +93,22 @@ def main():
         "--amount",
         required=True,
         type=float,
-        help="The monetary amount of the expense. Need to be an integer or float.",
+        help="The monetary amount of the expense.",
     )
     expense_parser.add_argument(
         "-d",
         "--description",
-        default="NO DESC",
+        default=DEFAULT_DESCRIPTION,
         type=str,
-        help="An optional description for the expense. Need to be a string.",
+        help="An optional description for the expense.",
+    )
+    expense_parser.add_argument(
+        "-cr",
+        "--currency",
+        default=DEFAULT_CURRENCY,
+        type=str,
+        help="An optional argument to define the currency, the \
+              default value is defined in the `expense.py` file.",
     )
 
     # Parse the arguments
@@ -106,7 +119,8 @@ def main():
         expense_filepath,
         args.name,
         args.category,
-        args.amount,
+        str(args.amount),
+        args.currency,
         args.description,
         date.strftime("%Y-%m-%d"),
     )
