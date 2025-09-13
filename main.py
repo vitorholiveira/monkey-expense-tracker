@@ -8,6 +8,7 @@ from dotenv import load_dotenv
 from constants import (
     AMOUNT_COLUMN,
     CURRENCY,
+    EXAMPLE_STR,
     EXPENSE_CATEGORIES,
     EXPENSE_DF_COLUMNS,
     PATH_TO_EXPENSE_FILES,
@@ -34,14 +35,20 @@ def main():
     # Create parser
     expense_parser = argparse.ArgumentParser(
         prog="uv run main.py",
-        description=f"usage example: uv run main.py -n popcorn -c FOOD -a 3.25 -d 'some_description'\n\nAdd expenses to the {expense_filename} file.",
+        description=f"{EXAMPLE_STR}\n\nAdd expenses to the {expense_filename} file.",
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     expense_parser.add_argument(
-        "-n", "--name", required=True, help="The name of the expense. Need to be a string."
+        "-n",
+        "--name",
+        required=True,
+        help="The name of the expense. Need to be a string.",
     )
     expense_parser.add_argument(
-        "-c", "--category", required=True, help=f"The category of the expense that should be one of {EXPENSE_CATEGORIES}."
+        "-c",
+        "--category",
+        required=True,
+        help=f"The category of the expense that should be one of {EXPENSE_CATEGORIES}.",
     )
     expense_parser.add_argument(
         "-a",

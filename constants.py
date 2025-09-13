@@ -19,3 +19,7 @@ EXPENSE_DF_COLUMNS = [
     DESCRIPTION_COLUMN,
     DATE_COLUMN,
 ]
+
+EXAMPLE_STR = (
+    "usage example: uv run main.py -n popcorn -c FOOD -a 3.25 -d 'some_description'"
+)
