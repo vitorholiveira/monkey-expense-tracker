@@ -52,10 +52,12 @@ def update_expense(
 
 
 def main():
+    # Get current month and year digits
     date = datetime.now()
     month = str(date.month) if date.month >= 10 else f"0{date.month}"
     year = str(date.year)
 
+    # Set filename and filepath
     expense_filename = f"expense-{year}-{month}.csv"
     os.makedirs(PATH_TO_EXPENSE_FILES, exist_ok=True)
     expense_filepath = PATH_TO_EXPENSE_FILES / expense_filename
@@ -99,6 +101,7 @@ def main():
     # Parse the arguments
     args = expense_parser.parse_args()
 
+    # Create or update expanse and calculate the amount left
     expense_df = update_expense(
         expense_filepath,
         args.name,
