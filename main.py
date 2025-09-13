@@ -7,8 +7,8 @@ from dotenv import load_dotenv
 
 from constants import (
     AMOUNT_COLUMN,
-    EXPENSE_CATEGORIES,
     CURRENCY,
+    EXPENSE_CATEGORIES,
     EXPENSE_DF_COLUMNS,
     PATH_TO_EXPENSE_FILES,
 )
@@ -31,36 +31,39 @@ def main():
     os.makedirs(PATH_TO_EXPENSE_FILES, exist_ok=True)
     expense_filepath = PATH_TO_EXPENSE_FILES / expense_filename
 
+    print("\n=================================================================================")
+    print("=> usage example: uv run main.py -n popcorn -c FOOD -a 3.25 -d 'some_description'")
+    print("=================================================================================\n")
     # Create parser
     expense_parser = argparse.ArgumentParser(
-        prog=f"Expense {month}/{year}",
-        description=f"Add expenses to the {expense_filename} file",
+        prog="uv run main.py",
+        description=f"Add expenses to the {expense_filename} file.",
     )
     expense_parser.add_argument(
-        "-n", "--name", required=True, help="The name of the expense"
+        "-n", "--name", required=True, help="The name of the expense. Need to be a string."
     )
     expense_parser.add_argument(
-        "-t", "--type", required=True, help="The category or type of the expense"
+        "-c", "--category", required=True, help=f"The category of the expense that should be one of {EXPENSE_CATEGORIES}."
     )
     expense_parser.add_argument(
         "-a",
         "--amount",
         required=True,
         type=float,
-        help="The monetary amount of the expense",
+        help="The monetary amount of the expense. Need to be an integer or a float.",
     )
     expense_parser.add_argument(
         "-d",
         "--description",
         default="NO DESC",
-        help="An optional description for the expense",
+        help="An optional description for the expense. Need to be a string.",
     )
 
     # Parse the arguments
     args = expense_parser.parse_args()
 
     # Validate category
-    if args.type not in EXPENSE_CATEGORIES:
+    if args.category not in EXPENSE_CATEGORIES:
         print(f"Type argument should be one of {EXPENSE_CATEGORIES}")
         return
 
@@ -71,7 +74,7 @@ def main():
             [
                 [
                     args.name,
-                    args.type,
+                    args.category,
                     args.amount,
                     args.description,
                     date.strftime("%Y-%m-%d"),
@@ -85,7 +88,7 @@ def main():
             [
                 [
                     args.name,
-                    args.type,
+                    args.category,
                     args.amount,
                     args.description,
                     date.strftime("%Y-%m-%d"),
