@@ -1,14 +1,6 @@
 from pathlib import Path
 
-CATEGORIES = [
-    "SPORTS",
-    "HEALTH",
-    "STUDY",
-    "FOOD",
-    "LEISURE",
-    "OTHERS",
-    "SAVINGS"
-]
+CATEGORIES = ["SPORTS", "HEALTH", "STUDY", "FOOD", "LEISURE", "OTHERS", "SAVINGS"]
 
 CURRENCY = "R$"
 
