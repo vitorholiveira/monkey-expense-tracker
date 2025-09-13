@@ -26,27 +26,14 @@ def calculate_amount_left(expense_df: pd.DataFrame):
 
 def update_expense(
     expense_filepath: Path,
-    name: str,
-    category: str,
-    amount: str,
-    currency: str,
-    description: str,
-    date: str,
+    expense_obj : Expense
 ) -> pd.DataFrame:
-    expense_obj = Expense(
-        name=name,
-        category=category,
-        amount=amount,
-        currency=currency,
-        description=description,
-        date=date,
-    )
-    if os.path.exists(expense_filepath):
+    if not os.path.exists(expense_filepath):
+        expense_df = expense_obj.get_df()
+    else:
         expense_df = pd.read_csv(expense_filepath)
         new_expense_row = expense_obj.get_df()
         expense_df = pd.concat([expense_df, new_expense_row], ignore_index=True)
-    else:
-        expense_df = expense_obj.get_df()
     expense_df.to_csv(expense_filepath, index=False)
     print(expense_df)
     print(f"\nExpense added successfully to {expense_filepath}")
@@ -114,15 +101,20 @@ def main():
     # Parse the arguments
     args = expense_parser.parse_args()
 
+    # Create expense object
+    expense_obj = Expense(
+        name=args.name,
+        category=args.category,
+        amount=args.amount,
+        currency=str(args.currency),
+        description=args.description,
+        date=date.strftime("%Y-%m-%d"),
+    )
+
     # Create or update expanse and calculate the amount left
     expense_df = update_expense(
         expense_filepath,
-        args.name,
-        args.category,
-        str(args.amount),
-        args.currency,
-        args.description,
-        date.strftime("%Y-%m-%d"),
+        expense_obj
     )
     calculate_amount_left(expense_df)
 
