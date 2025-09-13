@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 
 from constants import (
     AMOUNT_COLUMN,
-    CATEGORIES,
+    EXPENSE_CATEGORIES,
     CURRENCY,
     EXPENSE_DF_COLUMNS,
     PATH_TO_EXPENSE_FILES,
@@ -60,8 +60,8 @@ def main():
     args = expense_parser.parse_args()
 
     # Validate category
-    if args.type not in CATEGORIES:
-        print(f"Type argument should be one of {CATEGORIES}")
+    if args.type not in EXPENSE_CATEGORIES:
+        print(f"Type argument should be one of {EXPENSE_CATEGORIES}")
         return
 
     # Create or update expense DataFrame
