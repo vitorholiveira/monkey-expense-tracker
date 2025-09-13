@@ -31,13 +31,11 @@ def main():
     os.makedirs(PATH_TO_EXPENSE_FILES, exist_ok=True)
     expense_filepath = PATH_TO_EXPENSE_FILES / expense_filename
 
-    print("\n=================================================================================")
-    print("=> usage example: uv run main.py -n popcorn -c FOOD -a 3.25 -d 'some_description'")
-    print("=================================================================================\n")
     # Create parser
     expense_parser = argparse.ArgumentParser(
         prog="uv run main.py",
-        description=f"Add expenses to the {expense_filename} file.",
+        description=f"usage example: uv run main.py -n popcorn -c FOOD -a 3.25 -d 'some_description'\n\nAdd expenses to the {expense_filename} file.",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     expense_parser.add_argument(
         "-n", "--name", required=True, help="The name of the expense. Need to be a string."
