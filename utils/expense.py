@@ -6,12 +6,11 @@ from pathlib import Path
 import pandas as pd
 from dotenv import load_dotenv
 
-from config import (
+from utils.config import (
     AMOUNT_COLUMN,
     CATEGORY_COLUMN,
     CURRENCY_COLUMN,
     DATE_COLUMN,
-    DEFAULT_CURRENCY,
     DESCRIPTION_COLUMN,
     NAME_COLUMN,
     PATH_TO_EXPENSE_FILES,
@@ -27,7 +26,7 @@ class Expense:
     amount: str
     description: str
     date: str
-    currency: str = DEFAULT_CURRENCY
+    currency: str
     new_row_expense_df: pd.DataFrame = field(init=False)
     expense_df: pd.DataFrame = field(init=False)
 

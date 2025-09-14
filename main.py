@@ -1,12 +1,12 @@
 import argparse
 from datetime import datetime
 
-from config import (
+from utils.config import (
     DEFAULT_CURRENCY,
     DEFAULT_DESCRIPTION,
     EXPENSE_CATEGORIES,
 )
-from expense import Expense
+from utils.expense import Expense
 
 
 def main():
