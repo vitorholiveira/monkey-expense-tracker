@@ -16,6 +16,7 @@ from config import (
     NAME_COLUMN,
     PATH_TO_EXPENSE_FILES,
     PATH_TO_EXPENSE_FILES_BACKUP,
+    SUPPORTED_CURRENCIES,
 )
 
 
@@ -53,7 +54,7 @@ class Expense:
                 [backup_expense_df, self.new_row_expense_df], ignore_index=True
             )
             os.makedirs(PATH_TO_EXPENSE_FILES_BACKUP, exist_ok=True)
-            backup_expense_filename = f"expense-{datetime.now()}.csv"
+            backup_expense_filename = f"expense_{datetime.now().strftime("%Y-%m-%d_%H:%M:%S")}.csv"
             backup_expense_filepath = (
                 PATH_TO_EXPENSE_FILES_BACKUP / backup_expense_filename
             )
@@ -68,7 +69,10 @@ class Expense:
             print("error")
             return
         load_dotenv()
-        income = float(os.environ["INCOME"])
-        total_amount_expended = self.expense_df[AMOUNT_COLUMN].astype(float).sum()
-        amount_left = income - total_amount_expended
-        print(f"\n==> You have {DEFAULT_CURRENCY} {amount_left:.2f} left.\n")
+        for currency in SUPPORTED_CURRENCIES:
+            income = float(os.environ[f"INCOME_{currency}"])
+            if income == 0:
+                continue
+            total_amount_expended = self.expense_df.loc[self.expense_df[CURRENCY_COLUMN] == currency, AMOUNT_COLUMN].astype(float).sum()
+            amount_left = income - total_amount_expended
+            print(f"\n==> You have {currency} {amount_left:.2f} left.\n")

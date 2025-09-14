@@ -10,15 +10,9 @@ from expense import Expense
 
 
 def main():
-    # Get current month and year digits
     date = datetime.now()
-    month = str(date.month) if date.month >= 10 else f"0{date.month}"
-    year = str(date.year)
-
-    # Set filename and filepath
-    expense_filename = f"expense-{year}-{month}.csv"
-
-    # Create parser
+    expense_filename = f"expense_{date.strftime("%Y-%m")}.csv"
+    
     example_str = (
         "usage example: uv run main.py -n popcorn -c FOOD -a 3.25 -d 'some_description'"
     )
@@ -64,11 +58,8 @@ def main():
         help="An optional argument to define the currency, the \
               default value is defined in the `expense.py` file.",
     )
-
-    # Parse the arguments
     args = expense_parser.parse_args()
 
-    # Create expense object
     expense_obj = Expense(
         name=args.name,
         category=args.category,
@@ -78,7 +69,6 @@ def main():
         date=date.strftime("%Y-%m-%d"),
     )
 
-    # Create or update expanse and calculate the amount left
     expense_obj.update_expense(expense_filename)
     expense_obj.calculate_amount_left()
 
