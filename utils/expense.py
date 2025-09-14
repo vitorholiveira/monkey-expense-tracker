@@ -53,7 +53,9 @@ class Expense:
                 [backup_expense_df, self.new_row_expense_df], ignore_index=True
             )
             os.makedirs(PATH_TO_EXPENSE_FILES_BACKUP, exist_ok=True)
-            backup_expense_filename = f"expense_{datetime.now().strftime("%Y-%m-%d_%H:%M:%S")}.csv"
+            backup_expense_filename = (
+                f"expense_{datetime.now().strftime('%Y-%m-%d_%H:%M:%S')}.csv"
+            )
             backup_expense_filepath = (
                 PATH_TO_EXPENSE_FILES_BACKUP / backup_expense_filename
             )
@@ -72,6 +74,12 @@ class Expense:
             income = float(os.environ[f"INCOME_{currency}"])
             if income == 0:
                 continue
-            total_amount_expended = self.expense_df.loc[self.expense_df[CURRENCY_COLUMN] == currency, AMOUNT_COLUMN].astype(float).sum()
+            total_amount_expended = (
+                self.expense_df.loc[
+                    self.expense_df[CURRENCY_COLUMN] == currency, AMOUNT_COLUMN
+                ]
+                .astype(float)
+                .sum()
+            )
             amount_left = income - total_amount_expended
             print(f"\n==> You have {currency} {amount_left:.2f} left.\n")
