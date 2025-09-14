@@ -4,6 +4,7 @@ from datetime import datetime
 from utils.config import (
     DEFAULT_CURRENCY,
     DEFAULT_DESCRIPTION,
+    DEVELOPING,
     EXPENSE_CATEGORIES,
 )
 from utils.expense import Expense
@@ -11,7 +12,10 @@ from utils.expense import Expense
 
 def main():
     date = datetime.now()
-    expense_filename = f"expense_{date.strftime('%Y-%m')}.csv"
+    if DEVELOPING is True:
+        expense_filename = f"dev_{date.strftime('%Y-%m')}.csv"
+    else:
+        expense_filename = f"expense_{date.strftime('%Y-%m')}.csv"
 
     example_str = (
         "usage example: uv run main.py -n popcorn -c FOOD -a 3.25 -d 'some_description'"

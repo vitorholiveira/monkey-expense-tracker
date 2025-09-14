@@ -12,6 +12,7 @@ from utils.config import (
     CURRENCY_COLUMN,
     DATE_COLUMN,
     DESCRIPTION_COLUMN,
+    DEVELOPING,
     NAME_COLUMN,
     PATH_TO_EXPENSE_FILES,
     PATH_TO_EXPENSE_FILES_BACKUP,
@@ -53,9 +54,14 @@ class Expense:
                 [backup_expense_df, self.new_row_expense_df], ignore_index=True
             )
             os.makedirs(PATH_TO_EXPENSE_FILES_BACKUP, exist_ok=True)
-            backup_expense_filename = (
-                f"expense_{datetime.now().strftime('%Y-%m-%d_%H:%M:%S')}.csv"
-            )
+            if DEVELOPING is True:
+                backup_expense_filename = (
+                    f"dev_{datetime.now().strftime('%Y-%m-%d_%H:%M:%S')}.csv"
+                )
+            else:
+                backup_expense_filename = (
+                    f"expense_{datetime.now().strftime('%Y-%m-%d_%H:%M:%S')}.csv"
+                )
             backup_expense_filepath = (
                 PATH_TO_EXPENSE_FILES_BACKUP / backup_expense_filename
             )
