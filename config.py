@@ -1,0 +1,25 @@
+from pathlib import Path
+
+EXPENSE_CATEGORIES = [
+    "SPORTS",
+    "HEALTH",
+    "STUDY",
+    "FOOD",
+    "LEISURE",
+    "CLOTHES",
+    "OTHERS",
+    "SAVINGS",
+]
+
+DEFAULT_CURRENCY = "R$"
+DEFAULT_DESCRIPTION = "NO DESCRIPTION"
+
+PATH_TO_EXPENSE_FILES = Path("./expense_files")
+PATH_TO_EXPENSE_FILES_BACKUP = PATH_TO_EXPENSE_FILES / "backup"
+
+NAME_COLUMN = "Name"
+CATEGORY_COLUMN = "Category"
+AMOUNT_COLUMN = "Amount"
+CURRENCY_COLUMN = "Currency"
+DESCRIPTION_COLUMN = "Description"
+DATE_COLUMN = "Date"
