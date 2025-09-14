@@ -7,11 +7,15 @@ from utils.app_functions import load_csvs_to_dict
 from utils.config import (
     AMOUNT_COLUMN,
     CATEGORY_COLUMN,
+    CURRENCY_COLUMN,
     DATE_COLUMN,
+    DEFAULT_CURRENCY,
     PATH_TO_EXPENSE_FILES,
+    SUPPORTED_CURRENCIES,
 )
 
 dfs = load_csvs_to_dict(PATH_TO_EXPENSE_FILES)
+filenames = list(dfs.keys())
 
 app = Dash(__name__, external_stylesheets=[dbc.themes.JOURNAL])
 
@@ -19,13 +23,13 @@ app.layout = dbc.Container(
     [
         dbc.Col(
             [
-                html.H1(children="Expense", style={"textAlign": "center"}),
+                html.H1(children="Expense Tracker", style={"textAlign": "center"}),
                 dcc.Markdown(
                     """
-                I developed this project to gain better control over my expenses.
-                The main script's purpose is to add new expenses to a CSV file
-                that represents all expenses for the month. And this application
-                is to visualize the expense data.
+                This project is a personal expense tracker built to better
+                manage and visualize my monthly spending. The main script
+                logs new expenses to a CSV file, and the application provides
+                a clear data visualization of where the money goes.
                 """,
                     style={"textAlign": "center"},
                 ),
@@ -34,17 +38,39 @@ app.layout = dbc.Container(
         html.Br(),
         dbc.Col(
             [
-                html.H2("Month Analysis"),
-                dbc.Label("Select a file to analyse:"),
-                dcc.Dropdown(
-                    options=list(dfs.keys()),
-                    value=list(dfs.keys())[0],
-                    id="dropdown-selection-filename",
+                html.H2("Monthly Spending"),
+                dbc.Row(
+                    [
+                        dbc.Col(
+                            [
+                                dbc.Label("Select a file to analyse:"),
+                                dcc.Dropdown(
+                                    options=filenames,
+                                    value=filenames[0] if len(filenames) > 0 else None,
+                                    id="dropdown-selection-filename",
+                                    clearable=False,
+                                ),
+                            ],
+                            width=6,
+                        ),
+                        dbc.Col(
+                            [
+                                dbc.Label("Select a currency for the analysis:"),
+                                dcc.Dropdown(
+                                    options=SUPPORTED_CURRENCIES,
+                                    value=DEFAULT_CURRENCY,
+                                    id="dropdown-selection-currency-month",
+                                    clearable=False,
+                                ),
+                            ],
+                            width=6,
+                        ),
+                    ]
                 ),
                 dbc.Row(
                     [
-                        dbc.Col(dcc.Graph(id="line-chart"), width=8),
-                        dbc.Col(dcc.Graph(id="pie-chart"), width=4),
+                        dbc.Col(dcc.Graph(id="line-chart"), width=6),
+                        dbc.Col(dcc.Graph(id="pie-chart"), width=6),
                     ]
                 ),
                 html.Br(),
@@ -78,15 +104,18 @@ app.layout = dbc.Container(
     Output("expense-table", "data"),
     Output("expense-table", "columns"),
     Input("dropdown-selection-filename", "value"),
+    Input("dropdown-selection-currency-month", "value"),
 )
-def update_graphs(value):
-    if value is None:
+def update_graphs(filename, currency):
+    if filename is None:
         empty_fig = go.Figure(
             layout={"title": "Please select a file from the dropdown above."}
         )
         return empty_fig, empty_fig, [], []
 
-    df = dfs[value].copy()
+    df = dfs[filename].copy()
+
+    df = df[df[CURRENCY_COLUMN] == currency]
 
     # Line chart
     df_line = df.groupby([DATE_COLUMN, CATEGORY_COLUMN], as_index=False)[
