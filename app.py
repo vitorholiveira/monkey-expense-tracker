@@ -16,7 +16,7 @@ from utils.config import (
 )
 
 dfs = load_csvs_to_dict(PATH_TO_EXPENSE_FILES)
-filenames = sorted(list(dfs.keys()))
+dates = sorted(list(dfs.keys()))
 
 app = Dash(__name__, external_stylesheets=[dbc.themes.JOURNAL])
 
@@ -46,9 +46,9 @@ app.layout = dbc.Container(
                             [
                                 dbc.Label("Select a file to analyse:"),
                                 dcc.Dropdown(
-                                    options=filenames,
-                                    value=filenames[0] if len(filenames) > 0 else None,
-                                    id="dropdown-selection-filename",
+                                    options=dates,
+                                    value=dates[0] if len(dates) > 0 else None,
+                                    id="dropdown-selection-date",
                                     clearable=False,
                                 ),
                             ],
@@ -97,13 +97,13 @@ app.layout = dbc.Container(
                             [
                                 dbc.Label("Select a range to analyse:"),
                                 dcc.RangeSlider(
-                                    id="filename-range-slider",
+                                    id="date-range-slider",
                                     min=0,
-                                    max=len(filenames) - 1,
-                                    value=[0, len(filenames) - 1],
+                                    max=len(dates) - 1,
+                                    value=[0, len(dates) - 1],
                                     marks={
-                                        i: filename
-                                        for i, filename in enumerate(filenames)
+                                        i: date
+                                        for i, date in enumerate(dates)
                                     },
                                     step=1,
                                 ),
@@ -126,7 +126,7 @@ app.layout = dbc.Container(
                 ),
                 html.Br(),
                 html.Br(),
-                html.Div(id="filename-range-output"),
+                html.Div(id="date-range-output"),
             ]
         ),
     ],
@@ -140,17 +140,17 @@ app.layout = dbc.Container(
     Output("pie-chart-month", "figure"),
     Output("expense-table-month", "data"),
     Output("expense-table-month", "columns"),
-    Input("dropdown-selection-filename", "value"),
+    Input("dropdown-selection-date", "value"),
     Input("dropdown-selection-currency-month", "value"),
 )
-def update_graphs_month(filename, currency):
-    if filename is None:
+def update_graphs_month(date, currency):
+    if date is None:
         empty_fig = go.Figure(
             layout={"title": "Please select a file from the dropdown above."}
         )
         return empty_fig, empty_fig, [], []
 
-    df = dfs[filename].copy()
+    df = dfs[date].copy()
 
     df = df[df[CURRENCY_COLUMN] == currency]
 
@@ -181,14 +181,14 @@ def update_graphs_month(filename, currency):
 
 
 @app.callback(
-    Output("filename-range-output", "children"),
-    Input("filename-range-slider", "value"),
+    Output("date-range-output", "children"),
+    Input("date-range-slider", "value"),
     Input("dropdown-selection-currency-range", "value"),
 )
 def update_graphs_range(range, currency):
     start, end = range
     return (
-        f"Selected Range: {filenames[start]} → {filenames[end]} and {currency} currency."
+        f"Selected Range: {dates[start]} → {dates[end]} and {currency} currency."
     )
 
 

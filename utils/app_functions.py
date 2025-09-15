@@ -18,7 +18,7 @@ from utils.config import (
 
 def load_csvs_to_dict(folder_path: str) -> dict:
     path = Path(folder_path)
-    dataframes = {p.stem: pd.read_csv(p) for p in path.glob("expense_*.csv")}
+    dataframes = {str(p.stem)[8:]: pd.read_csv(p) for p in path.glob("expense_*.csv")}
     return dataframes
 
 
