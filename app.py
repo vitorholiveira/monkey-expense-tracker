@@ -90,7 +90,7 @@ app.layout = dbc.Container(
         html.Br(),
         dbc.Col(
             [
-                html.H2("Analysis"),
+                html.H2("Custom Range Speding"),
                 dbc.Row(
                     [
                         dbc.Col(
@@ -143,7 +143,7 @@ app.layout = dbc.Container(
     Input("dropdown-selection-filename", "value"),
     Input("dropdown-selection-currency-month", "value"),
 )
-def update_graphs(filename, currency):
+def update_graphs_month(filename, currency):
     if filename is None:
         empty_fig = go.Figure(
             layout={"title": "Please select a file from the dropdown above."}
@@ -185,7 +185,7 @@ def update_graphs(filename, currency):
     Input("filename-range-slider", "value"),
     Input("dropdown-selection-currency-range", "value"),
 )
-def update_output(range, currency):
+def update_graphs_range(range, currency):
     start, end = range
     return (
         f"Selected Range: {filenames[start]} → {filenames[end]} and {currency} currency."
