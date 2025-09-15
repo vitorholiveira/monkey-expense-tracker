@@ -24,15 +24,15 @@ app.layout = dbc.Container(
     [
         dbc.Col(
             [
-                html.H1(children="Expense Tracker", style={"textAlign": "center"}),
+                html.H1("Expense Tracker", style={"textAlign": "center"}),
                 dcc.Markdown(
                     """
-                This project is a personal expense tracker built to better
-                manage and visualize my monthly spending. The main script
-                logs new expenses to a CSV file, and the application provides
-                a clear data visualization of where the money goes.
-                """,
-                    style={"textAlign": "center"},
+                    This project is a personal expense tracker built to better
+                    manage and visualize my monthly spending. The main script
+                    logs new expenses to a CSV file, and the application provides
+                    a clear data visualization of where the money goes.
+                    """,
+                style={"paddingLeft": "25vw", "paddingRight": "25vw", "textAlign": "center"},
                 ),
             ],
         ),
@@ -40,6 +40,7 @@ app.layout = dbc.Container(
         dbc.Col(
             [
                 html.H2("Monthly Spending"),
+                html.Br(),
                 dbc.Row(
                     [
                         dbc.Col(
@@ -91,36 +92,29 @@ app.layout = dbc.Container(
         dbc.Col(
             [
                 html.H2("Custom Range Speding"),
+                html.Br(),
                 dbc.Row(
                     [
-                        dbc.Col(
-                            [
-                                dbc.Label("Select a range to analyse:"),
-                                dcc.RangeSlider(
-                                    id="date-range-slider",
-                                    min=0,
-                                    max=len(dates) - 1,
-                                    value=[0, len(dates) - 1],
-                                    marks={
-                                        i: date
-                                        for i, date in enumerate(dates)
-                                    },
-                                    step=1,
-                                ),
-                            ],
-                            width=6,
+                        dbc.Label("Select a currency for the analysis:"),
+                        dcc.Dropdown(
+                            options=SUPPORTED_CURRENCIES,
+                            value=DEFAULT_CURRENCY,
+                            id="dropdown-selection-currency-range",
+                            clearable=False,
                         ),
-                        dbc.Col(
-                            [
-                                dbc.Label("Select a currency for the analysis:"),
-                                dcc.Dropdown(
-                                    options=SUPPORTED_CURRENCIES,
-                                    value=DEFAULT_CURRENCY,
-                                    id="dropdown-selection-currency-range",
-                                    clearable=False,
-                                ),
-                            ],
-                            width=6,
+                        html.Br(),
+                        html.Br(),
+                        dbc.Label("Select a range to analyse:"),
+                        dcc.RangeSlider(
+                            id="date-range-slider",
+                            min=0,
+                            max=len(dates) - 1,
+                            value=[0, len(dates) - 1],
+                            marks={
+                                i: date
+                                for i, date in enumerate(dates)
+                            },
+                            step=1,
                         ),
                     ]
                 ),
