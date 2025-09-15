@@ -18,22 +18,22 @@ from utils.config import (
 
 def load_csvs_to_dict(folder_path: str) -> dict:
     path = Path(folder_path)
-    dataframes = {p.stem: pd.read_csv(p) for p in path.glob("*.csv")}
+    dataframes = {p.stem: pd.read_csv(p) for p in path.glob("expense_*.csv")}
     return dataframes
 
 
-def create_savings_df(df: pd.DataFrame, currency: str) -> pd.DataFrame:
+def create_amount_left_df(df: pd.DataFrame, currency: str) -> pd.DataFrame:
     load_dotenv()
     spend = df.loc[df[CATEGORY_COLUMN] != "SAVINGS"][AMOUNT_COLUMN].sum()
     income = float(os.environ[f"INCOME_{currency}"])
-    savings_df = pd.DataFrame(
+    amount_left_df = pd.DataFrame(
         {
-            NAME_COLUMN: ["amount left"],
-            CATEGORY_COLUMN: ["SAVINGS"],
+            NAME_COLUMN: ["Amount left"],
+            CATEGORY_COLUMN: ["AMOUNT LEFT"],
             AMOUNT_COLUMN: [income - spend],
             CURRENCY_COLUMN: [currency],
             DESCRIPTION_COLUMN: [DEFAULT_DESCRIPTION],
             DATE_COLUMN: [datetime.now().strftime("%Y-%m-%d")],
         }
     )
-    return savings_df
+    return amount_left_df

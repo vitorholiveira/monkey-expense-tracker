@@ -4,7 +4,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 from dash import Dash, Input, Output, callback, dash_table, dcc, html
 
-from utils.app_functions import create_savings_df, load_csvs_to_dict
+from utils.app_functions import create_amount_left_df, load_csvs_to_dict
 from utils.config import (
     AMOUNT_COLUMN,
     CATEGORY_COLUMN,
@@ -91,10 +91,46 @@ app.layout = dbc.Container(
         dbc.Col(
             [
                 html.H2("Analysis"),
+                dbc.Row(
+                    [
+                        dbc.Col(
+                            [
+                                dbc.Label("Select a range to analyse:"),
+                                dcc.RangeSlider(
+                                    id="filename-range-slider",
+                                    min=0,
+                                    max=len(filenames) - 1,
+                                    value=[0, len(filenames) - 1],
+                                    marks={
+                                        i: filename
+                                        for i, filename in enumerate(filenames)
+                                    },
+                                    step=1,
+                                ),
+                            ],
+                            width=6,
+                        ),
+                        dbc.Col(
+                            [
+                                dbc.Label("Select a currency for the analysis:"),
+                                dcc.Dropdown(
+                                    options=SUPPORTED_CURRENCIES,
+                                    value=DEFAULT_CURRENCY,
+                                    id="dropdown-selection-currency-month",
+                                    clearable=False,
+                                ),
+                            ],
+                            width=6,
+                        ),
+                    ]
+                ),
+                html.Br(),
+                html.Br(),
+                html.Div(id="filename-range-output"),
             ]
         ),
     ],
-    className="px-5 py-3",
+    className="px-5 py-3 mb-5",
     fluid=True,
 )
 
@@ -127,9 +163,9 @@ def update_graphs(filename, currency):
     )
 
     # Pie chart
-    savings_df = create_savings_df(df, currency)
+    amount_left_df = create_amount_left_df(df, currency)
     df_pie = (
-        pd.concat([df, savings_df], ignore_index=True)
+        pd.concat([df, amount_left_df], ignore_index=True)
         .groupby([CATEGORY_COLUMN], as_index=False)[AMOUNT_COLUMN]
         .sum()
     )
@@ -142,6 +178,16 @@ def update_graphs(filename, currency):
     data = df.to_dict("records")
 
     return line_fig, pie_fig, data, columns
+
+
+@app.callback(
+    Output("filename-range-output", "children"),
+    Input("filename-range-slider", "value"),
+    Input("dropdown-selection-currency-range", "value"),
+)
+def update_output(value):
+    start, end = value
+    return f"Selected Range: {filenames[start]} → {filenames[end]}"
 
 
 if __name__ == "__main__":
