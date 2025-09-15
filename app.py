@@ -121,7 +121,7 @@ def update_graphs(filename, currency):
     df_line = df.groupby([DATE_COLUMN, CATEGORY_COLUMN], as_index=False)[
         AMOUNT_COLUMN
     ].sum()
-    line_fig = px.line(df_line, x=DATE_COLUMN, y=AMOUNT_COLUMN, color=CATEGORY_COLUMN)
+    line_fig = px.line(df_line, x=DATE_COLUMN, y=AMOUNT_COLUMN, color=CATEGORY_COLUMN, markers=True)
 
     # Pie chart
     df_pie = df.groupby([CATEGORY_COLUMN], as_index=False)[AMOUNT_COLUMN].sum()
