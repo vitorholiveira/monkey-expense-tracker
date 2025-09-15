@@ -16,7 +16,7 @@ from utils.config import (
 )
 
 dfs = load_csvs_to_dict(PATH_TO_EXPENSE_FILES)
-filenames = list(dfs.keys())
+filenames = sorted(list(dfs.keys()))
 
 app = Dash(__name__, external_stylesheets=[dbc.themes.JOURNAL])
 
