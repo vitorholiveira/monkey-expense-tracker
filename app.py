@@ -1,7 +1,12 @@
+import os
+from datetime import datetime
+
 import dash_bootstrap_components as dbc
+import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 from dash import Dash, Input, Output, callback, dash_table, dcc, html
+from dotenv import load_dotenv
 
 from utils.app_functions import load_csvs_to_dict
 from utils.config import (
@@ -10,6 +15,9 @@ from utils.config import (
     CURRENCY_COLUMN,
     DATE_COLUMN,
     DEFAULT_CURRENCY,
+    DEFAULT_DESCRIPTION,
+    DESCRIPTION_COLUMN,
+    NAME_COLUMN,
     PATH_TO_EXPENSE_FILES,
     SUPPORTED_CURRENCIES,
 )
@@ -121,10 +129,29 @@ def update_graphs(filename, currency):
     df_line = df.groupby([DATE_COLUMN, CATEGORY_COLUMN], as_index=False)[
         AMOUNT_COLUMN
     ].sum()
-    line_fig = px.line(df_line, x=DATE_COLUMN, y=AMOUNT_COLUMN, color=CATEGORY_COLUMN, markers=True)
+    line_fig = px.line(
+        df_line, x=DATE_COLUMN, y=AMOUNT_COLUMN, color=CATEGORY_COLUMN, markers=True
+    )
 
     # Pie chart
-    df_pie = df.groupby([CATEGORY_COLUMN], as_index=False)[AMOUNT_COLUMN].sum()
+    load_dotenv()
+    spend = df.loc[df[CATEGORY_COLUMN] != "SAVINGS"][AMOUNT_COLUMN].sum()
+    income = float(os.environ[f"INCOME_{currency}"])
+    savings_row = pd.DataFrame(
+        {
+            NAME_COLUMN: ["amount left"],
+            CATEGORY_COLUMN: ["SAVINGS"],
+            AMOUNT_COLUMN: [income - spend],
+            CURRENCY_COLUMN: [currency],
+            DESCRIPTION_COLUMN: [DEFAULT_DESCRIPTION],
+            DATE_COLUMN: [datetime.now().strftime("%Y-%m-%d")],
+        }
+    )
+    df_pie = (
+        pd.concat([df, savings_row], ignore_index=True)
+        .groupby([CATEGORY_COLUMN], as_index=False)[AMOUNT_COLUMN]
+        .sum()
+    )
     pie_fig = px.pie(
         df_pie, values=AMOUNT_COLUMN, names=CATEGORY_COLUMN, color=CATEGORY_COLUMN
     )
