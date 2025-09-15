@@ -70,13 +70,13 @@ app.layout = dbc.Container(
                 ),
                 dbc.Row(
                     [
-                        dbc.Col(dcc.Graph(id="line-chart"), width=6),
-                        dbc.Col(dcc.Graph(id="pie-chart"), width=6),
+                        dbc.Col(dcc.Graph(id="line-chart-month"), width=6),
+                        dbc.Col(dcc.Graph(id="pie-chart-month"), width=6),
                     ]
                 ),
                 html.Br(),
                 dash_table.DataTable(
-                    id="expense-table",
+                    id="expense-table-month",
                     page_size=10,
                     filter_action="native",
                     sort_action="native",
@@ -116,7 +116,7 @@ app.layout = dbc.Container(
                                 dcc.Dropdown(
                                     options=SUPPORTED_CURRENCIES,
                                     value=DEFAULT_CURRENCY,
-                                    id="dropdown-selection-currency-month",
+                                    id="dropdown-selection-currency-range",
                                     clearable=False,
                                 ),
                             ],
@@ -136,10 +136,10 @@ app.layout = dbc.Container(
 
 
 @callback(
-    Output("line-chart", "figure"),
-    Output("pie-chart", "figure"),
-    Output("expense-table", "data"),
-    Output("expense-table", "columns"),
+    Output("line-chart-month", "figure"),
+    Output("pie-chart-month", "figure"),
+    Output("expense-table-month", "data"),
+    Output("expense-table-month", "columns"),
     Input("dropdown-selection-filename", "value"),
     Input("dropdown-selection-currency-month", "value"),
 )
@@ -185,9 +185,11 @@ def update_graphs(filename, currency):
     Input("filename-range-slider", "value"),
     Input("dropdown-selection-currency-range", "value"),
 )
-def update_output(value):
-    start, end = value
-    return f"Selected Range: {filenames[start]} → {filenames[end]}"
+def update_output(range, currency):
+    start, end = range
+    return (
+        f"Selected Range: {filenames[start]} → {filenames[end]} and {currency} currency."
+    )
 
 
 if __name__ == "__main__":
