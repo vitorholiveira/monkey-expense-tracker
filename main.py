@@ -2,6 +2,7 @@ import argparse
 from datetime import datetime
 
 from utils.config import (
+    DEFAULT_CATEGORY,
     DEFAULT_CURRENCY,
     DEFAULT_DESCRIPTION,
     DEVELOPING,
@@ -18,7 +19,7 @@ def main():
         expense_filename = f"expense_{date.strftime('%Y-%m')}.csv"
 
     example_str = (
-        "usage example: uv run main.py -n popcorn -c FOOD -a 3.25 -d 'some_description'"
+        "usage example: uv run main.py -n popcorn -a 3.25 -i 1 -c FOOD -d 'some_description'"
     )
     expense_parser = argparse.ArgumentParser(
         prog="uv run main.py",
@@ -33,14 +34,6 @@ def main():
         help="The name of the expense.",
     )
     expense_parser.add_argument(
-        "-c",
-        "--category",
-        required=True,
-        choices=EXPENSE_CATEGORIES,
-        type=str,
-        help="The category of the expense.",
-    )
-    expense_parser.add_argument(
         "-a",
         "--amount",
         required=True,
@@ -48,11 +41,28 @@ def main():
         help="The monetary amount of the expense.",
     )
     expense_parser.add_argument(
+        "-i",
+        "--installments",
+        default=1,
+        required=False,
+        type=float,
+        help="[OPTIONAL] The number of installments to pay.",
+    )
+    expense_parser.add_argument(
+        "-c",
+        "--category",
+        default=DEFAULT_CATEGORY,
+        required=False,
+        choices=EXPENSE_CATEGORIES,
+        type=str,
+        help="[OPTIONAL] The category of the expense.",
+    )
+    expense_parser.add_argument(
         "-d",
         "--description",
         default=DEFAULT_DESCRIPTION,
         type=str,
-        help="An optional description for the expense.",
+        help="[OPTIONAL] The description of the expense.",
     )
     expense_parser.add_argument(
         "-cr",
@@ -66,15 +76,15 @@ def main():
 
     expense_obj = Expense(
         name=args.name,
-        category=args.category,
         amount=args.amount,
+        installments=args.installments,
+        category=args.category,
         currency=str(args.currency),
         description=args.description,
-        date=date.strftime("%Y-%m-%d"),
+        date=date,
     )
 
     expense_obj.update_expense(expense_filename)
-    expense_obj.calculate_amount_left()
 
 
 if __name__ == "__main__":

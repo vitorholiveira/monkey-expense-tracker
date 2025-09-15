@@ -135,6 +135,7 @@ dependencies = [
     { name = "dash-bootstrap-components" },
     { name = "dotenv" },
     { name = "pandas" },
+    { name = "python-dateutil" },
     { name = "ruff" },
 ]
 
@@ -149,6 +150,7 @@ requires-dist = [
     { name = "dash-bootstrap-components", specifier = ">=2.0.4" },
     { name = "dotenv", specifier = ">=0.9.9" },
     { name = "pandas", specifier = ">=2.3.2" },
+    { name = "python-dateutil", specifier = ">=2.9.0.post0" },
     { name = "ruff", specifier = ">=0.13.0" },
 ]
 
