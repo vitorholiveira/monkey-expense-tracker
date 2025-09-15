@@ -1,23 +1,16 @@
-import os
-from datetime import datetime
-
 import dash_bootstrap_components as dbc
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 from dash import Dash, Input, Output, callback, dash_table, dcc, html
-from dotenv import load_dotenv
 
-from utils.app_functions import load_csvs_to_dict
+from utils.app_functions import create_savings_df, load_csvs_to_dict
 from utils.config import (
     AMOUNT_COLUMN,
     CATEGORY_COLUMN,
     CURRENCY_COLUMN,
     DATE_COLUMN,
     DEFAULT_CURRENCY,
-    DEFAULT_DESCRIPTION,
-    DESCRIPTION_COLUMN,
-    NAME_COLUMN,
     PATH_TO_EXPENSE_FILES,
     SUPPORTED_CURRENCIES,
 )
@@ -134,21 +127,9 @@ def update_graphs(filename, currency):
     )
 
     # Pie chart
-    load_dotenv()
-    spend = df.loc[df[CATEGORY_COLUMN] != "SAVINGS"][AMOUNT_COLUMN].sum()
-    income = float(os.environ[f"INCOME_{currency}"])
-    savings_row = pd.DataFrame(
-        {
-            NAME_COLUMN: ["amount left"],
-            CATEGORY_COLUMN: ["SAVINGS"],
-            AMOUNT_COLUMN: [income - spend],
-            CURRENCY_COLUMN: [currency],
-            DESCRIPTION_COLUMN: [DEFAULT_DESCRIPTION],
-            DATE_COLUMN: [datetime.now().strftime("%Y-%m-%d")],
-        }
-    )
+    savings_df = create_savings_df(df, currency)
     df_pie = (
-        pd.concat([df, savings_row], ignore_index=True)
+        pd.concat([df, savings_df], ignore_index=True)
         .groupby([CATEGORY_COLUMN], as_index=False)[AMOUNT_COLUMN]
         .sum()
     )
