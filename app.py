@@ -11,11 +11,11 @@ from utils.config import (
     CURRENCY_COLUMN,
     DATE_COLUMN,
     DEFAULT_CURRENCY,
-    PATH_TO_EXPENSE_FILES,
+    PATH_TO_EXPENSE_FILES_CURRENT,
     SUPPORTED_CURRENCIES,
 )
 
-dfs = load_csvs_to_dict(PATH_TO_EXPENSE_FILES)
+dfs = load_csvs_to_dict(PATH_TO_EXPENSE_FILES_CURRENT)
 dates = sorted(list(dfs.keys()))
 
 app = Dash(__name__, external_stylesheets=[dbc.themes.JOURNAL])
@@ -158,6 +158,7 @@ def update_graphs_month(date, currency):
     )
 
     # Pie chart
+    print(df)
     amount_left_df = create_amount_left_df(df, currency)
     df_pie = (
         pd.concat([df, amount_left_df], ignore_index=True)

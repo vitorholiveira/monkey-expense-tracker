@@ -87,9 +87,10 @@ class Expense:
         # Load expenses
         expense_filename = self._get_filename(self.date[self.installment_count])
         if DEVELOPING is True:
-            subdir = Path("dev") / self.date[self.installment_count].strftime("%Y-%m")
+            subdir = "dev"
         else:
-            subdir = self.date[self.installment_count].strftime("%Y-%m")
+            subdir_backup = self.date[self.installment_count].strftime("%Y-%m")
+            subdir = "current"
         os.makedirs(PATH_TO_EXPENSE_FILES / subdir, exist_ok=True)
         expense_filepath = PATH_TO_EXPENSE_FILES / subdir / expense_filename
         if not os.path.exists(expense_filepath):
@@ -100,24 +101,21 @@ class Expense:
                 [old_expense_df, self.new_row_expense_df], ignore_index=True
             )
 
-        # Setup backup
-        os.makedirs(PATH_TO_EXPENSE_FILES_BACKUP / subdir, exist_ok=True)
-        if DEVELOPING is True:
-            backup_expense_filename = (
-                f"dev_{datetime.now().strftime('%Y-%m-%d_%H:%M:%S')}.csv"
-            )
-        else:
+        # If is not developing, then save backup files
+        if DEVELOPING is False:
+            os.makedirs(PATH_TO_EXPENSE_FILES_BACKUP / subdir_backup, exist_ok=True)
             backup_expense_filename = (
                 f"expense_{datetime.now().strftime('%Y-%m-%d_%H:%M:%S')}.csv"
             )
-        backup_expense_filepath = (
-            PATH_TO_EXPENSE_FILES_BACKUP / subdir / backup_expense_filename
-        )
-        # Save backup
-        if DEVELOPING is False:
+            backup_expense_filepath = (
+                PATH_TO_EXPENSE_FILES_BACKUP / subdir_backup / backup_expense_filename
+            )
             self.expense_df.to_csv(backup_expense_filepath, index=False)
+
         # Save current expense file
         self.expense_df.to_csv(expense_filepath, index=False)
+
+        # Print info
         print(
             "\n================================================================================="
         )
@@ -127,6 +125,8 @@ class Expense:
         print(
             "=================================================================================\n"
         )
+
+        # Recursively update installments
         if self.installment_count < self.installments - 1:
             self._update_installments()
         return self.expense_df

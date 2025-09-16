@@ -24,7 +24,7 @@ def load_csvs_to_dict(folder_path: str) -> dict:
 
 def create_amount_left_df(df: pd.DataFrame, currency: str) -> pd.DataFrame:
     load_dotenv()
-    spend = df.loc[df[CATEGORY_COLUMN] != "SAVINGS"][AMOUNT_COLUMN].sum()
+    spend = df.loc[df[CATEGORY_COLUMN] != "SAVINGS"][AMOUNT_COLUMN].astype(float).sum()
     income = float(os.environ[f"INCOME_{currency}"])
     amount_left_df = pd.DataFrame(
         {
