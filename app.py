@@ -4,7 +4,11 @@ import plotly.express as px
 import plotly.graph_objects as go
 from dash import Dash, Input, Output, callback, dash_table, dcc, html
 
-from utils.app_functions import create_amount_left_df, load_csvs_to_dict
+from utils.app_functions import (
+    create_amount_left_df,
+    create_expense_df,
+    load_csvs_to_dict,
+)
 from utils.config import (
     AMOUNT_COLUMN,
     CATEGORY_COLUMN,
@@ -121,7 +125,22 @@ app.layout = dbc.Container(
                 ),
                 html.Br(),
                 html.Br(),
-                html.Div(id="date-range-output"),
+                dbc.Row(
+                    [
+                        dbc.Col(dcc.Graph(id="line-chart-range"), width=6),
+                        dbc.Col(dcc.Graph(id="pie-chart-range"), width=6),
+                    ]
+                ),
+                html.Br(),
+                dash_table.DataTable(
+                    id="expense-table-range",
+                    page_size=10,
+                    filter_action="native",
+                    sort_action="native",
+                    style_table={"overflowX": "auto"},
+                    style_cell={"textAlign": "center"},
+                    style_header={"backgroundColor": "lightgrey", "fontWeight": "bold"},
+                ),
             ]
         ),
     ],
@@ -158,7 +177,6 @@ def update_graphs_month(date, currency):
     )
 
     # Pie chart
-    print(df)
     amount_left_df = create_amount_left_df(df, currency)
     df_pie = (
         pd.concat([df, amount_left_df], ignore_index=True)
@@ -177,13 +195,47 @@ def update_graphs_month(date, currency):
 
 
 @app.callback(
-    Output("date-range-output", "children"),
+    Output("line-chart-range", "figure"),
+    Output("pie-chart-range", "figure"),
+    Output("expense-table-range", "data"),
+    Output("expense-table-range", "columns"),
     Input("date-range-slider", "value"),
     Input("dropdown-selection-currency-range", "value"),
 )
 def update_graphs_range(range, currency):
     start, end = range
-    return f"Selected Range: {dates[start]} → {dates[end]} and {currency} currency."
+    num_months = len(dates[start:end])
+
+    df = create_expense_df(dfs, dates[start:end])
+
+    df = df[df[CURRENCY_COLUMN] == currency]
+
+    # Line chart
+    df_line = df.groupby([DATE_COLUMN, CATEGORY_COLUMN], as_index=False)[
+        AMOUNT_COLUMN
+    ].sum()
+    line_fig = px.line(
+        df_line, x=DATE_COLUMN, y=AMOUNT_COLUMN, color=CATEGORY_COLUMN, markers=True
+    )
+
+    # Pie chart
+    amount_left_df = create_amount_left_df(df, currency, num_months)
+    df_pie = (
+        pd.concat([df, amount_left_df], ignore_index=True)
+        .groupby([CATEGORY_COLUMN], as_index=False)[AMOUNT_COLUMN]
+        .sum()
+    )
+    print("df_pie")
+    print(pd.DataFrame(df_pie))
+    pie_fig = px.pie(
+        df_pie, values=AMOUNT_COLUMN, names=CATEGORY_COLUMN, color=CATEGORY_COLUMN
+    )
+
+    # Table
+    columns = [{"name": col, "id": col} for col in df.columns]
+    data = df.to_dict("records")
+
+    return line_fig, pie_fig, data, columns
 
 
 if __name__ == "__main__":

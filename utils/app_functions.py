@@ -16,13 +16,24 @@ from utils.config import (
 )
 
 
+def create_expense_df(dfs: pd.DataFrame, dates: list[str]):
+    df = pd.DataFrame()
+    for date in dates:
+        df = pd.concat([df, dfs[date]], ignore_index=True)
+    print("expense_df")
+    print(df)
+    return df
+
+
 def load_csvs_to_dict(folder_path: str) -> dict:
     path = Path(folder_path)
     dataframes = {str(p.stem)[8:]: pd.read_csv(p) for p in path.glob("expense_*.csv")}
     return dataframes
 
 
-def create_amount_left_df(df: pd.DataFrame, currency: str) -> pd.DataFrame:
+def create_amount_left_df(
+    df: pd.DataFrame, currency: str, num_months: str = 1
+) -> pd.DataFrame:
     load_dotenv()
     spend = df.loc[df[CATEGORY_COLUMN] != "SAVINGS"][AMOUNT_COLUMN].astype(float).sum()
     income = float(os.environ[f"INCOME_{currency}"])
@@ -30,7 +41,7 @@ def create_amount_left_df(df: pd.DataFrame, currency: str) -> pd.DataFrame:
         {
             NAME_COLUMN: ["Amount left"],
             CATEGORY_COLUMN: ["AMOUNT LEFT"],
-            AMOUNT_COLUMN: [income - spend],
+            AMOUNT_COLUMN: [num_months * income - spend],
             CURRENCY_COLUMN: [currency],
             DESCRIPTION_COLUMN: [DEFAULT_DESCRIPTION],
             DATE_COLUMN: [datetime.now().strftime("%Y-%m-%d")],

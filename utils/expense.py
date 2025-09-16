@@ -2,11 +2,11 @@ import os
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
+from typing import Optional
 
 import pandas as pd
 from dateutil.relativedelta import relativedelta
 from dotenv import load_dotenv
-from typing import Optional
 
 from utils.config import (
     AMOUNT_COLUMN,
@@ -66,13 +66,13 @@ class Expense:
             amount_left = income - total_amount_expended
             print(f"\n==> You have {currency} {amount_left:.2f} left.")
 
-    def _get_filename(self, date : datetime) -> str:
+    def _get_filename(self, date: datetime) -> str:
         if DEVELOPING is True:
             filename = f"dev_{date.strftime('%Y-%m')}.csv"
         else:
             filename = f"expense_{date.strftime('%Y-%m')}.csv"
         return filename
-    
+
     def _update_installments(self):
         self.installment_count += 1
         self.date.append(datetime.now() + relativedelta(months=self.installment_count))

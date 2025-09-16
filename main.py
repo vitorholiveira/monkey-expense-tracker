@@ -1,11 +1,9 @@
 import argparse
-from datetime import datetime
 
 from utils.config import (
     DEFAULT_CATEGORY,
     DEFAULT_CURRENCY,
     DEFAULT_DESCRIPTION,
-    DEVELOPING,
     EXPENSE_CATEGORIES,
 )
 from utils.expense import Expense
