@@ -12,16 +12,10 @@ from utils.expense import Expense
 
 
 def main():
-    date = datetime.now()
-    if DEVELOPING is True:
-        expense_filename = f"dev_{date.strftime('%Y-%m')}.csv"
-    else:
-        expense_filename = f"expense_{date.strftime('%Y-%m')}.csv"
-
     example_str = "usage example: uv run main.py -n popcorn -a 3.25 -i 1 -c FOOD -d 'some_description'"
     expense_parser = argparse.ArgumentParser(
         prog="uv run main.py",
-        description=f"{example_str}\n\nAdd expenses to the {expense_filename} file.",
+        description=f"{example_str}\n\nAdd expenses to CSV's file(s).",
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     expense_parser.add_argument(
@@ -79,10 +73,9 @@ def main():
         category=args.category,
         currency=str(args.currency),
         description=args.description,
-        date=date,
     )
 
-    expense_obj.update_expense(expense_filename)
+    expense_obj.update_expense()
 
 
 if __name__ == "__main__":

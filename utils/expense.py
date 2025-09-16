@@ -6,6 +6,7 @@ from pathlib import Path
 import pandas as pd
 from dateutil.relativedelta import relativedelta
 from dotenv import load_dotenv
+from typing import Optional
 
 from utils.config import (
     AMOUNT_COLUMN,
@@ -28,10 +29,11 @@ class Expense:
     installments: str
     category: str
     description: str
-    date: datetime
     currency: str
+    date: list[datetime] = field(init=False, default_factory=lambda: [datetime.now()])
     new_row_expense_df: pd.DataFrame = field(init=False)
     expense_df: pd.DataFrame = field(init=False)
+    installment_count: int = field(init=False, default=0)
 
     def __post_init__(self):
         self.new_row_expense_df = pd.DataFrame(
@@ -41,7 +43,7 @@ class Expense:
                 AMOUNT_COLUMN: [self.amount / self.installments],
                 CURRENCY_COLUMN: [self.currency],
                 DESCRIPTION_COLUMN: [self.description],
-                DATE_COLUMN: [self.date.strftime("%Y-%m-%d")],
+                DATE_COLUMN: [self.date[self.installment_count].strftime("%Y-%m-%d")],
             }
         )
 
@@ -64,25 +66,29 @@ class Expense:
             amount_left = income - total_amount_expended
             print(f"\n==> You have {currency} {amount_left:.2f} left.")
 
+    def _get_filename(self, date : datetime) -> str:
+        if DEVELOPING is True:
+            filename = f"dev_{date.strftime('%Y-%m')}.csv"
+        else:
+            filename = f"expense_{date.strftime('%Y-%m')}.csv"
+        return filename
+    
     def _update_installments(self):
-        future_date = datetime.now() + relativedelta(months=self.installments - 1)
-        future_date = future_date.replace(
+        self.installment_count += 1
+        self.date.append(datetime.now() + relativedelta(months=self.installment_count))
+        self.date[self.installment_count] = self.date[self.installment_count].replace(
             day=1, hour=0, minute=0, second=0, microsecond=0
         )
-        self.installments = self.installments - 1
-        self.new_row_expense_df[DATE_COLUMN] = future_date
-        if DEVELOPING is True:
-            expense_filename = f"dev_{future_date.strftime('%Y-%m')}.csv"
-        else:
-            expense_filename = f"expense_{future_date.strftime('%Y-%m')}.csv"
+        self.new_row_expense_df[DATE_COLUMN] = self.date[self.installment_count]
+        expense_filename = self._get_filename(self.date[self.installment_count])
         self.update_expense(expense_filename)
 
-    def update_expense(self, expense_filename: Path) -> pd.DataFrame:
-        self.date = datetime.now() + relativedelta(months=self.installments - 1)
+    def update_expense(self, expense_filename: Optional[Path] = None) -> pd.DataFrame:
+        expense_filename = self._get_filename(self.date[self.installment_count])
         if DEVELOPING is True:
             subdir = "dev"
         else:
-            subdir = self.date.strftime("%Y-%m")
+            subdir = self.date[self.installment_count].strftime("%Y-%m")
         os.makedirs(PATH_TO_EXPENSE_FILES / subdir, exist_ok=True)
         expense_filepath = PATH_TO_EXPENSE_FILES / subdir / expense_filename
         if not os.path.exists(expense_filepath):
@@ -115,6 +121,6 @@ class Expense:
         print(
             "=================================================================================\n"
         )
-        if self.installments > 1:
+        if self.installment_count < self.installments - 1:
             self._update_installments()
         return self.expense_df
