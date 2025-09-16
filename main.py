@@ -18,9 +18,7 @@ def main():
     else:
         expense_filename = f"expense_{date.strftime('%Y-%m')}.csv"
 
-    example_str = (
-        "usage example: uv run main.py -n popcorn -a 3.25 -i 1 -c FOOD -d 'some_description'"
-    )
+    example_str = "usage example: uv run main.py -n popcorn -a 3.25 -i 1 -c FOOD -d 'some_description'"
     expense_parser = argparse.ArgumentParser(
         prog="uv run main.py",
         description=f"{example_str}\n\nAdd expenses to the {expense_filename} file.",

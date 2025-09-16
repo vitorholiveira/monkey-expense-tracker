@@ -32,7 +32,11 @@ app.layout = dbc.Container(
                     logs new expenses to a CSV file, and the application provides
                     a clear data visualization of where the money goes.
                     """,
-                style={"paddingLeft": "25vw", "paddingRight": "25vw", "textAlign": "center"},
+                    style={
+                        "paddingLeft": "25vw",
+                        "paddingRight": "25vw",
+                        "textAlign": "center",
+                    },
                 ),
             ],
         ),
@@ -110,10 +114,7 @@ app.layout = dbc.Container(
                             min=0,
                             max=len(dates) - 1,
                             value=[0, len(dates) - 1],
-                            marks={
-                                i: date
-                                for i, date in enumerate(dates)
-                            },
+                            marks={i: date for i, date in enumerate(dates)},
                             step=1,
                         ),
                     ]
@@ -181,9 +182,7 @@ def update_graphs_month(date, currency):
 )
 def update_graphs_range(range, currency):
     start, end = range
-    return (
-        f"Selected Range: {dates[start]} → {dates[end]} and {currency} currency."
-    )
+    return f"Selected Range: {dates[start]} → {dates[end]} and {currency} currency."
 
 
 if __name__ == "__main__":

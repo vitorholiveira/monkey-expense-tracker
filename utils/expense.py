@@ -78,8 +78,13 @@ class Expense:
         self.update_expense(expense_filename)
 
     def update_expense(self, expense_filename: Path) -> pd.DataFrame:
-        os.makedirs(PATH_TO_EXPENSE_FILES, exist_ok=True)
-        expense_filepath = PATH_TO_EXPENSE_FILES / expense_filename
+        self.date = datetime.now() + relativedelta(months=self.installments - 1)
+        if DEVELOPING is True:
+            subdir = "dev"
+        else:
+            subdir = self.date.strftime("%Y-%m")
+        os.makedirs(PATH_TO_EXPENSE_FILES / subdir, exist_ok=True)
+        expense_filepath = PATH_TO_EXPENSE_FILES / subdir / expense_filename
         if not os.path.exists(expense_filepath):
             self.expense_df = self.new_row_expense_df
         else:
