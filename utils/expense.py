@@ -84,9 +84,10 @@ class Expense:
         self.update_expense(expense_filename)
 
     def update_expense(self, expense_filename: Optional[Path] = None) -> pd.DataFrame:
+        # Load expenses
         expense_filename = self._get_filename(self.date[self.installment_count])
         if DEVELOPING is True:
-            subdir = "dev"
+            subdir = Path("dev") / self.date[self.installment_count].strftime("%Y-%m")
         else:
             subdir = self.date[self.installment_count].strftime("%Y-%m")
         os.makedirs(PATH_TO_EXPENSE_FILES / subdir, exist_ok=True)
@@ -94,23 +95,28 @@ class Expense:
         if not os.path.exists(expense_filepath):
             self.expense_df = self.new_row_expense_df
         else:
-            backup_expense_df = pd.read_csv(expense_filepath)
+            old_expense_df = pd.read_csv(expense_filepath)
             self.expense_df = pd.concat(
-                [backup_expense_df, self.new_row_expense_df], ignore_index=True
+                [old_expense_df, self.new_row_expense_df], ignore_index=True
             )
-            os.makedirs(PATH_TO_EXPENSE_FILES_BACKUP, exist_ok=True)
-            if DEVELOPING is True:
-                backup_expense_filename = (
-                    f"dev_{datetime.now().strftime('%Y-%m-%d_%H:%M:%S')}.csv"
-                )
-            else:
-                backup_expense_filename = (
-                    f"expense_{datetime.now().strftime('%Y-%m-%d_%H:%M:%S')}.csv"
-                )
-            backup_expense_filepath = (
-                PATH_TO_EXPENSE_FILES_BACKUP / backup_expense_filename
+
+        # Setup backup
+        os.makedirs(PATH_TO_EXPENSE_FILES_BACKUP / subdir, exist_ok=True)
+        if DEVELOPING is True:
+            backup_expense_filename = (
+                f"dev_{datetime.now().strftime('%Y-%m-%d_%H:%M:%S')}.csv"
             )
-            backup_expense_df.to_csv(backup_expense_filepath, index=False)
+        else:
+            backup_expense_filename = (
+                f"expense_{datetime.now().strftime('%Y-%m-%d_%H:%M:%S')}.csv"
+            )
+        backup_expense_filepath = (
+            PATH_TO_EXPENSE_FILES_BACKUP / subdir / backup_expense_filename
+        )
+        # Save backup
+        if DEVELOPING is False:
+            self.expense_df.to_csv(backup_expense_filepath, index=False)
+        # Save current expense file
         self.expense_df.to_csv(expense_filepath, index=False)
         print(
             "\n================================================================================="
