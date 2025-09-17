@@ -1,8 +1,10 @@
+import json
 import os
 from datetime import datetime
 from pathlib import Path
 
 import pandas as pd
+from dateutil.relativedelta import relativedelta
 from dotenv import load_dotenv
 
 from utils.config import (
@@ -13,7 +15,30 @@ from utils.config import (
     DEFAULT_DESCRIPTION,
     DESCRIPTION_COLUMN,
     NAME_COLUMN,
+    PATH_TO_INCOME_FILE,
 )
+
+
+def get_income(date: str, currency: str) -> int:
+    income_dict = dict()
+    with open(PATH_TO_INCOME_FILE, "r") as file:
+        income_dict = json.load(file)
+    income_df = pd.DataFrame(income_dict)
+    date_curr = date
+    while True:
+        if date_curr in income_df:
+            break
+        date_curr = (
+            datetime.strptime(date_curr, "%Y-%m") - relativedelta(months=1)
+        ).strftime("%Y-%m")
+    date_target = date_curr
+    while date != date_curr:
+        date_curr = (
+            datetime.strptime(date_curr, "%Y-%m") + relativedelta(months=1)
+        ).strftime("%Y-%m")
+        income_df[date_curr] = income_df[date_target]
+    income_df.to_json(PATH_TO_INCOME_FILE, indent=4)
+    return income_df[date_curr][currency]
 
 
 def create_expense_df(dfs: pd.DataFrame, dates: list[str]):
