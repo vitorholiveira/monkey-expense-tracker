@@ -225,8 +225,6 @@ def update_graphs_range(range, currency):
         .groupby([CATEGORY_COLUMN], as_index=False)[AMOUNT_COLUMN]
         .sum()
     )
-    print("df_pie")
-    print(pd.DataFrame(df_pie))
     pie_fig = px.pie(
         df_pie, values=AMOUNT_COLUMN, names=CATEGORY_COLUMN, color=CATEGORY_COLUMN
     )

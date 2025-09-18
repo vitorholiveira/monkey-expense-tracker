@@ -6,8 +6,8 @@ from typing import Optional
 
 import pandas as pd
 from dateutil.relativedelta import relativedelta
-from dotenv import load_dotenv
 
+from utils.app_functions import get_income
 from utils.config import (
     AMOUNT_COLUMN,
     CATEGORY_COLUMN,
@@ -51,9 +51,9 @@ class Expense:
         if self.expense_df.empty:
             print("error")
             return
-        load_dotenv()
         for currency in SUPPORTED_CURRENCIES:
-            income = float(os.environ[f"INCOME_{currency}"])
+            date_curr = self.date[self.installment_count].strftime("%Y-%m")
+            income = get_income(date=date_curr, currency=currency)
             if income == 0:
                 continue
             total_amount_expended = (
