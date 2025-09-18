@@ -24,6 +24,106 @@ dates = sorted(list(dfs.keys()))
 
 app = Dash(__name__, external_stylesheets=[dbc.themes.JOURNAL])
 
+monthly_spending_page = dbc.Col(
+    [
+        html.H2("Monthly Spending"),
+        html.Br(),
+        dbc.Row(
+            [
+                dbc.Col(
+                    [
+                        dbc.Label("Select a file to analyse:"),
+                        dcc.Dropdown(
+                            options=dates,
+                            value=dates[0] if len(dates) > 0 else None,
+                            id="dropdown-selection-date",
+                            clearable=False,
+                        ),
+                    ],
+                    width=6,
+                ),
+                dbc.Col(
+                    [
+                        dbc.Label("Select a currency for the analysis:"),
+                        dcc.Dropdown(
+                            options=SUPPORTED_CURRENCIES,
+                            value=DEFAULT_CURRENCY,
+                            id="dropdown-selection-currency-month",
+                            clearable=False,
+                        ),
+                    ],
+                    width=6,
+                ),
+            ]
+        ),
+        dbc.Row(
+            [
+                dbc.Col(dcc.Graph(id="bar-chart-month"), width=6),
+                dbc.Col(dcc.Graph(id="pie-chart-month"), width=6),
+            ]
+        ),
+        html.Br(),
+        dash_table.DataTable(
+            id="expense-table-month",
+            page_size=10,
+            filter_action="native",
+            sort_action="native",
+            style_table={"overflowX": "auto"},
+            style_cell={"textAlign": "center"},
+            style_header={"backgroundColor": "lightgrey", "fontWeight": "bold"},
+        ),
+    ]
+)
+
+
+custom_spend_page = dbc.Col(
+    [
+        html.H2("Custom Range Speding"),
+        html.Br(),
+        dbc.Row(
+            [
+                dbc.Label("Select a currency for the analysis:"),
+                dcc.Dropdown(
+                    options=SUPPORTED_CURRENCIES,
+                    value=DEFAULT_CURRENCY,
+                    id="dropdown-selection-currency-range",
+                    clearable=False,
+                ),
+                html.Br(),
+                html.Br(),
+                dbc.Label("Select a range to analyse:"),
+                dcc.RangeSlider(
+                    id="date-range-slider",
+                    min=0,
+                    max=len(dates) - 1,
+                    value=[0, len(dates) - 1],
+                    marks={i: date for i, date in enumerate(dates)},
+                    step=1,
+                ),
+            ]
+        ),
+        html.Br(),
+        html.Br(),
+        dbc.Row(dbc.Col(dcc.Graph(id="line-chart-range"))),
+        dbc.Row(
+            [
+                dbc.Col(dcc.Graph(id="bar-chart-range"), width=6),
+                dbc.Col(dcc.Graph(id="pie-chart-range"), width=6),
+            ]
+        ),
+        html.Br(),
+        dash_table.DataTable(
+            id="expense-table-range",
+            page_size=10,
+            filter_action="native",
+            sort_action="native",
+            style_table={"overflowX": "auto"},
+            style_cell={"textAlign": "center"},
+            style_header={"backgroundColor": "lightgrey", "fontWeight": "bold"},
+        ),
+    ]
+)
+
 app.layout = dbc.Container(
     [
         dbc.Col(
@@ -45,104 +145,10 @@ app.layout = dbc.Container(
             ],
         ),
         html.Br(),
-        dbc.Col(
-            [
-                html.H2("Monthly Spending"),
-                html.Br(),
-                dbc.Row(
-                    [
-                        dbc.Col(
-                            [
-                                dbc.Label("Select a file to analyse:"),
-                                dcc.Dropdown(
-                                    options=dates,
-                                    value=dates[0] if len(dates) > 0 else None,
-                                    id="dropdown-selection-date",
-                                    clearable=False,
-                                ),
-                            ],
-                            width=6,
-                        ),
-                        dbc.Col(
-                            [
-                                dbc.Label("Select a currency for the analysis:"),
-                                dcc.Dropdown(
-                                    options=SUPPORTED_CURRENCIES,
-                                    value=DEFAULT_CURRENCY,
-                                    id="dropdown-selection-currency-month",
-                                    clearable=False,
-                                ),
-                            ],
-                            width=6,
-                        ),
-                    ]
-                ),
-                dbc.Row(
-                    [
-                        dbc.Col(dcc.Graph(id="line-chart-month"), width=6),
-                        dbc.Col(dcc.Graph(id="pie-chart-month"), width=6),
-                    ]
-                ),
-                html.Br(),
-                dash_table.DataTable(
-                    id="expense-table-month",
-                    page_size=10,
-                    filter_action="native",
-                    sort_action="native",
-                    style_table={"overflowX": "auto"},
-                    style_cell={"textAlign": "center"},
-                    style_header={"backgroundColor": "lightgrey", "fontWeight": "bold"},
-                ),
-            ]
-        ),
+        monthly_spending_page,
         html.Br(),
         html.Br(),
-        dbc.Col(
-            [
-                html.H2("Custom Range Speding"),
-                html.Br(),
-                dbc.Row(
-                    [
-                        dbc.Label("Select a currency for the analysis:"),
-                        dcc.Dropdown(
-                            options=SUPPORTED_CURRENCIES,
-                            value=DEFAULT_CURRENCY,
-                            id="dropdown-selection-currency-range",
-                            clearable=False,
-                        ),
-                        html.Br(),
-                        html.Br(),
-                        dbc.Label("Select a range to analyse:"),
-                        dcc.RangeSlider(
-                            id="date-range-slider",
-                            min=0,
-                            max=len(dates) - 1,
-                            value=[0, len(dates) - 1],
-                            marks={i: date for i, date in enumerate(dates)},
-                            step=1,
-                        ),
-                    ]
-                ),
-                html.Br(),
-                html.Br(),
-                dbc.Row(
-                    [
-                        dbc.Col(dcc.Graph(id="line-chart-range"), width=6),
-                        dbc.Col(dcc.Graph(id="pie-chart-range"), width=6),
-                    ]
-                ),
-                html.Br(),
-                dash_table.DataTable(
-                    id="expense-table-range",
-                    page_size=10,
-                    filter_action="native",
-                    sort_action="native",
-                    style_table={"overflowX": "auto"},
-                    style_cell={"textAlign": "center"},
-                    style_header={"backgroundColor": "lightgrey", "fontWeight": "bold"},
-                ),
-            ]
-        ),
+        custom_spend_page,
     ],
     className="px-5 py-3 mb-5",
     fluid=True,
@@ -150,7 +156,7 @@ app.layout = dbc.Container(
 
 
 @callback(
-    Output("line-chart-month", "figure"),
+    Output("bar-chart-month", "figure"),
     Output("pie-chart-month", "figure"),
     Output("expense-table-month", "data"),
     Output("expense-table-month", "columns"),
@@ -169,12 +175,10 @@ def update_graphs_month(date, currency):
     df = df[df[CURRENCY_COLUMN] == currency]
 
     # Line chart
-    df_line = df.groupby([DATE_COLUMN, CATEGORY_COLUMN], as_index=False)[
+    df_bar = df.groupby([DATE_COLUMN, CATEGORY_COLUMN], as_index=False)[
         AMOUNT_COLUMN
     ].sum()
-    line_fig = px.line(
-        df_line, x=DATE_COLUMN, y=AMOUNT_COLUMN, color=CATEGORY_COLUMN, markers=True
-    )
+    bar_fig = px.bar(df_bar, x=DATE_COLUMN, y=AMOUNT_COLUMN, color=CATEGORY_COLUMN)
 
     # Pie chart
     amount_left_df = create_amount_left_df(df, currency)
@@ -191,11 +195,12 @@ def update_graphs_month(date, currency):
     columns = [{"name": col, "id": col} for col in df.columns]
     data = df.to_dict("records")
 
-    return line_fig, pie_fig, data, columns
+    return bar_fig, pie_fig, data, columns
 
 
 @app.callback(
     Output("line-chart-range", "figure"),
+    Output("bar-chart-range", "figure"),
     Output("pie-chart-range", "figure"),
     Output("expense-table-range", "data"),
     Output("expense-table-range", "columns"),
@@ -209,6 +214,14 @@ def update_graphs_range(range, currency):
     df = create_expense_df(dfs, dates[start:end])
 
     df = df[df[CURRENCY_COLUMN] == currency]
+
+    # Line chart
+    df_bar = df.copy()
+    df_bar[DATE_COLUMN] = df_bar[DATE_COLUMN].map(lambda d: d[:7])
+    df_bar = df_bar.groupby([DATE_COLUMN, CATEGORY_COLUMN], as_index=False)[
+        AMOUNT_COLUMN
+    ].sum()
+    bar_fig = px.bar(df_bar, x=CATEGORY_COLUMN, y=AMOUNT_COLUMN, color=DATE_COLUMN)
 
     # Line chart
     df_line = df.groupby([DATE_COLUMN, CATEGORY_COLUMN], as_index=False)[
@@ -233,7 +246,7 @@ def update_graphs_range(range, currency):
     columns = [{"name": col, "id": col} for col in df.columns]
     data = df.to_dict("records")
 
-    return line_fig, pie_fig, data, columns
+    return line_fig, bar_fig, pie_fig, data, columns
 
 
 if __name__ == "__main__":
