@@ -1,11 +1,11 @@
 import dash_bootstrap_components as dbc
 from dash import Dash, dcc, html, page_container
 
-from utils.app_functions import (
-    load_csvs_to_dict,
-)
 from utils.config import (
     PATH_TO_EXPENSE_FILES_CURRENT,
+)
+from utils.functions import (
+    load_csvs_to_dict,
 )
 
 dfs = load_csvs_to_dict(PATH_TO_EXPENSE_FILES_CURRENT)

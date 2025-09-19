@@ -7,7 +7,6 @@ from typing import Optional
 import pandas as pd
 from dateutil.relativedelta import relativedelta
 
-from utils.app_functions import get_income
 from utils.config import (
     AMOUNT_COLUMN,
     CATEGORY_COLUMN,
@@ -20,6 +19,7 @@ from utils.config import (
     PATH_TO_EXPENSE_FILES_BACKUP,
     SUPPORTED_CURRENCIES,
 )
+from utils.functions import get_income
 
 
 @dataclass

@@ -3,11 +3,6 @@ import pandas as pd
 import plotly.express as px
 from dash import Input, Output, callback, dash_table, dcc, html, register_page
 
-from utils.app_functions import (
-    create_amount_left_df,
-    create_expense_df,
-    load_csvs_to_dict,
-)
 from utils.config import (
     AMOUNT_COLUMN,
     CATEGORY_COLUMN,
@@ -16,6 +11,11 @@ from utils.config import (
     DEFAULT_CURRENCY,
     PATH_TO_EXPENSE_FILES_CURRENT,
     SUPPORTED_CURRENCIES,
+)
+from utils.functions import (
+    create_amount_left_df,
+    create_expense_df,
+    load_csvs_to_dict,
 )
 
 # Register this script as a page
