@@ -11,14 +11,22 @@ from utils.config import (
 dfs = load_csvs_to_dict(PATH_TO_EXPENSE_FILES_CURRENT)
 dates = sorted(list(dfs.keys()))
 
-app = Dash(__name__, suppress_callback_exceptions=True, use_pages=True, external_stylesheets=[dbc.themes.JOURNAL])
+app = Dash(
+    __name__,
+    suppress_callback_exceptions=True,
+    use_pages=True,
+    external_stylesheets=[dbc.themes.JOURNAL],
+)
 
 app.layout = dbc.Container(
     [
         dbc.Col(
             [
                 dcc.Link(
-                    html.H1("Expense Tracker", style={"textAlign": "center", "cursor": "pointer"}),
+                    html.H1(
+                        "Expense Tracker",
+                        style={"textAlign": "center", "cursor": "pointer"},
+                    ),
                     href="/",
                     style={"textDecoration": "none", "color": "inherit"},
                 ),
@@ -37,9 +45,9 @@ app.layout = dbc.Container(
                         ),
                     ],
                     horizontal=True,
-                    pills=True, # This enables the styling our CSS targets
+                    pills=True,  # This enables the styling our CSS targets
                     className="justify-content-center",
-                )
+                ),
             ],
         ),
         dbc.Col(page_container),
