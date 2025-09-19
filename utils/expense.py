@@ -70,8 +70,8 @@ class Expense:
         new_date_formated = self.date[self.installment_count].strftime("%Y-%m-%d")
         self.new_row_expense_df[DATE_COLUMN] = new_date_formated
 
-    def _save_expense_df(self, expense_directory: Path, expense_filepath: Path) -> None:
-        os.makedirs(expense_directory, exist_ok=True)
+    def _save_expense_df(self, expense_filepath: Path) -> None:
+        os.makedirs(os.path.dirname(expense_filepath), exist_ok=True)
         if not os.path.exists(expense_filepath):
             self.expense_df = self.new_row_expense_df
         else:
@@ -114,10 +114,10 @@ class Expense:
             )
             expense_subdir = "dev"
             backup_directory = PATH_TO_EXPENSE_FILES_DEV_BACKUP / backup_subdir
-        expense_directory = PATH_TO_EXPENSE_FILES / expense_subdir
-        expense_filepath = expense_directory / expense_filename
 
-        self._save_expense_df(expense_directory, expense_filepath)
+        expense_filepath = PATH_TO_EXPENSE_FILES / expense_subdir / expense_filename
+
+        self._save_expense_df(expense_filepath)
 
         self._save_backup(backup_directory)
 
