@@ -2,7 +2,13 @@ import dash_bootstrap_components as dbc
 from dash import dcc, html, register_page
 
 # Register as a Dash page
-register_page(__name__, path="/", name="Monkey Expense Tracker", title="Monkey Expense Tracker", order=0)
+register_page(
+    __name__,
+    path="/",
+    name="Monkey Expense Tracker",
+    title="Monkey Expense Tracker",
+    order=0,
+)
 
 layout = dbc.Col(
     [
