@@ -2,7 +2,6 @@ import os
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
-from typing import Optional
 
 import pandas as pd
 from dateutil.relativedelta import relativedelta
@@ -17,8 +16,8 @@ from utils.config import (
     NAME_COLUMN,
     PATH_TO_EXPENSE_FILES,
     PATH_TO_EXPENSE_FILES_CURRENT_BACKUP,
-    SUPPORTED_CURRENCIES,
     PATH_TO_EXPENSE_FILES_DEV_BACKUP,
+    SUPPORTED_CURRENCIES,
 )
 from utils.functions import get_income
 
@@ -64,12 +63,12 @@ class Expense:
             amount_left = income - total_amount_expended
             print(f"\n==> You have {currency} {amount_left:.2f} left.")
 
-    def _update_installments(self):
-        self.date.append(datetime.now() + relativedelta(months=self.installment_count))
-        self.date[self.installment_count] = self.date[self.installment_count].replace(
-            day=1, hour=0, minute=0, second=0, microsecond=0
-        )
-        self.new_row_expense_df[DATE_COLUMN] = self.date[self.installment_count]
+    def _update_date_for_installments(self):
+        new_date = datetime.now() + relativedelta(months=self.installment_count)
+        new_date = new_date.replace(day=1, hour=0, minute=0, second=0)
+        self.date.append(new_date)
+        new_date_formated = self.date[self.installment_count].strftime("%Y-%m-%d")
+        self.new_row_expense_df[DATE_COLUMN] = new_date_formated
 
     def _save_expense_df(self, expense_directory: Path, expense_filepath: Path) -> None:
         os.makedirs(expense_directory, exist_ok=True)
@@ -87,9 +86,7 @@ class Expense:
         backup_expense_filename = (
             f"backup_{datetime.now().strftime('%Y-%m-%d_%H:%M:%S')}.csv"
         )
-        backup_expense_filepath = (
-            backup_directory / backup_expense_filename
-        )
+        backup_expense_filepath = backup_directory / backup_expense_filename
         self.expense_df.to_csv(backup_expense_filepath, index=False)
 
     def _print_info(self, expense_filepath: Path) -> None:
@@ -106,14 +103,18 @@ class Expense:
     def update_expense(self) -> pd.DataFrame:
         backup_subdir = self.date[self.installment_count].strftime("%Y-%m")
         if DEVELOPING is False:
-            expense_filename = f"expense_{self.date[self.installment_count].strftime('%Y-%m')}.csv"
+            expense_filename = (
+                f"expense_{self.date[self.installment_count].strftime('%Y-%m')}.csv"
+            )
             expense_subdir = "current"
             backup_directory = PATH_TO_EXPENSE_FILES_CURRENT_BACKUP / backup_subdir
         else:
-            expense_filename = f"dev_{self.date[self.installment_count].strftime('%Y-%m')}.csv"
+            expense_filename = (
+                f"dev_{self.date[self.installment_count].strftime('%Y-%m')}.csv"
+            )
             expense_subdir = "dev"
             backup_directory = PATH_TO_EXPENSE_FILES_DEV_BACKUP / backup_subdir
-        expense_directory = PATH_TO_EXPENSE_FILES / expense_subdir 
+        expense_directory = PATH_TO_EXPENSE_FILES / expense_subdir
         expense_filepath = expense_directory / expense_filename
 
         self._save_expense_df(expense_directory, expense_filepath)
@@ -125,7 +126,7 @@ class Expense:
         # Recursively update installments
         if self.installment_count < self.installments - 1:
             self.installment_count += 1
-            self._update_installments()
+            self._update_date_for_installments()
             self.update_expense()
 
         return self.expense_df
