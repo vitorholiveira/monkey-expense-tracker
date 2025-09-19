@@ -14,11 +14,15 @@ This project requires a few steps to get started.
 
 ## How expense data is stored
 
-Expense data is stored in CSV files located in the `expense_files/current` folder. Each month has its own dedicated file, named `expense_YYYY-MM.csv`.
+Expense data is stored in CSV files located in the `expense_files/current/` folder. Each month has its own dedicated file, named `expense_YYYY-MM.csv`.
 
 When a new expense is added, it is appended as a new line in the CSV file. This new file then overwrites the previous version, while a backup of the current file is saved. Backups are stored in a dedicated directory for each month, located at `expense_files/backup/YYYY-MM/`. These backup files follow the naming convention `expense_YYYY-MM-DD_HH:MM:SS.csv`.
 
 An alternative storage method is available for development mode. By setting the `DEVELOPING` constant to `True` in `utils/config.py`, files will be stored as `dev_YYYY-MM.csv` in the `expanse_files/dev` directory, and the backup logic will be disabled. When `DEVELOPING` is `False`, the data is stored using the default method, including backups.
+
+## How installments are implemented
+
+One of the key features implemented is the option to add expenses paid in installments. By default, the number of installments is set to one, but you can choose how many installments you need. Since it’s impossible to know your exact income in future months, the system uses your current income as a reference. The implementation checks the nearest available income value and updates `income/.income.json` with that value for the upcoming months. If your income changes, you need to manually update `income/.income.json` with the new value.
 
 ## Data Visualization
 

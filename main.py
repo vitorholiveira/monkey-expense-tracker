@@ -10,10 +10,11 @@ from utils.expense import Expense
 
 
 def main():
-    example_str = "usage example: uv run main.py -n popcorn -a 3.25 -i 1 -c FOOD -d 'some_description'"
+    example_str = "usage example:\nuv run main.py -n popcorn -a 3.25 -i 1 -c FOOD -d 'some_description'"
+    example_installments_str = "usage example with installments (sneakers cost BRL 500):\nuv run main.py -n sneakers -a 500 -i 3 -c CLOTHES"
     expense_parser = argparse.ArgumentParser(
         prog="uv run main.py",
-        description=f"{example_str}\n\nAdd expenses to CSV's file(s).",
+        description=f"{example_str}\n\n{example_installments_str}\n\nAdd expenses to CSV's file(s).",
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     expense_parser.add_argument(
