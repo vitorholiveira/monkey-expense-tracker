@@ -1,7 +1,6 @@
 import dash_bootstrap_components as dbc
-from dash import Dash, dcc, html
+from dash import Dash, dcc, html, page_container
 
-from pages import custom_range_spending_page, monthly_spending_page
 from utils.app_functions import (
     load_csvs_to_dict,
 )
@@ -12,33 +11,38 @@ from utils.config import (
 dfs = load_csvs_to_dict(PATH_TO_EXPENSE_FILES_CURRENT)
 dates = sorted(list(dfs.keys()))
 
-app = Dash(__name__, external_stylesheets=[dbc.themes.JOURNAL])
+app = Dash(__name__, suppress_callback_exceptions=True, use_pages=True, external_stylesheets=[dbc.themes.JOURNAL])
 
 app.layout = dbc.Container(
     [
         dbc.Col(
             [
-                html.H1("Expense Tracker", style={"textAlign": "center"}),
-                dcc.Markdown(
-                    """
-                    This project is a personal expense tracker built to better
-                    manage and visualize my monthly spending. The main script
-                    logs new expenses to a CSV file, and the application provides
-                    a clear data visualization of where the money goes.
-                    """,
-                    style={
-                        "paddingLeft": "25vw",
-                        "paddingRight": "25vw",
-                        "textAlign": "center",
-                    },
+                dcc.Link(
+                    html.H1("Expense Tracker", style={"textAlign": "center", "cursor": "pointer"}),
+                    href="/",
+                    style={"textDecoration": "none", "color": "inherit"},
                 ),
+                html.Br(),
+                dbc.Nav(
+                    [
+                        dbc.NavLink(
+                            "Monthly Spending",
+                            href="/monthly-spending",
+                            active="exact",
+                        ),
+                        dbc.NavLink(
+                            "Custom Range Spending",
+                            href="/custom-range-spending",
+                            active="exact",
+                        ),
+                    ],
+                    horizontal=True,
+                    pills=True, # This enables the styling our CSS targets
+                    className="justify-content-center",
+                )
             ],
         ),
-        html.Br(),
-        monthly_spending_page(),
-        html.Br(),
-        html.Br(),
-        custom_range_spending_page(),
+        dbc.Col(page_container),
     ],
     className="px-5 py-3 mb-5",
     fluid=True,

@@ -1,7 +1,7 @@
 import dash_bootstrap_components as dbc
 import pandas as pd
 import plotly.express as px
-from dash import Input, Output, callback, dash_table, dcc, html
+from dash import Input, Output, callback, dash_table, dcc, html, register_page
 
 from utils.app_functions import (
     create_amount_left_df,
@@ -18,58 +18,66 @@ from utils.config import (
     SUPPORTED_CURRENCIES,
 )
 
+# Register this script as a page
+register_page(
+    __name__,
+    path="/custom-range-spending",
+    name="Custom Range Spending",
+    title="Custom Range Spending",
+)
+
+# Load data
 dfs = load_csvs_to_dict(PATH_TO_EXPENSE_FILES_CURRENT)
 dates = sorted(list(dfs.keys()))
 
-
-def custom_range_spending_page():
-    return dbc.Col(
-        [
-            html.H2("Custom Range Speding"),
-            html.Br(),
-            dbc.Row(
-                [
-                    dbc.Label("Select a currency for the analysis:"),
-                    dcc.Dropdown(
-                        options=SUPPORTED_CURRENCIES,
-                        value=DEFAULT_CURRENCY,
-                        id="dropdown-selection-currency-range",
-                        clearable=False,
-                    ),
-                    html.Br(),
-                    html.Br(),
-                    dbc.Label("Select a range to analyse:"),
-                    dcc.RangeSlider(
-                        id="date-range-slider",
-                        min=0,
-                        max=len(dates) - 1,
-                        value=[0, len(dates) - 1],
-                        marks={i: date for i, date in enumerate(dates)},
-                        step=1,
-                    ),
-                ]
-            ),
-            html.Br(),
-            html.Br(),
-            dbc.Row(dbc.Col(dcc.Graph(id="line-chart-range"))),
-            dbc.Row(
-                [
-                    dbc.Col(dcc.Graph(id="bar-chart-range"), width=6),
-                    dbc.Col(dcc.Graph(id="pie-chart-range"), width=6),
-                ]
-            ),
-            html.Br(),
-            dash_table.DataTable(
-                id="expense-table-range",
-                page_size=10,
-                filter_action="native",
-                sort_action="native",
-                style_table={"overflowX": "auto"},
-                style_cell={"textAlign": "center"},
-                style_header={"backgroundColor": "lightgrey", "fontWeight": "bold"},
-            ),
-        ]
-    )
+# Layout definition
+layout = dbc.Col(
+    [
+        html.H2("Custom Range Spending"),
+        html.Br(),
+        dbc.Row(
+            [
+                dbc.Label("Select a currency for the analysis:"),
+                dcc.Dropdown(
+                    options=SUPPORTED_CURRENCIES,
+                    value=DEFAULT_CURRENCY,
+                    id="dropdown-selection-currency-range",
+                    clearable=False,
+                ),
+                html.Br(),
+                html.Br(),
+                dbc.Label("Select a range to analyse:"),
+                dcc.RangeSlider(
+                    id="date-range-slider",
+                    min=0,
+                    max=len(dates) - 1,
+                    value=[0, len(dates) - 1],
+                    marks={i: date for i, date in enumerate(dates)},
+                    step=1,
+                ),
+            ]
+        ),
+        html.Br(),
+        html.Br(),
+        dbc.Row(dbc.Col(dcc.Graph(id="line-chart-range"))),
+        dbc.Row(
+            [
+                dbc.Col(dcc.Graph(id="bar-chart-range"), width=6),
+                dbc.Col(dcc.Graph(id="pie-chart-range"), width=6),
+            ]
+        ),
+        html.Br(),
+        dash_table.DataTable(
+            id="expense-table-range",
+            page_size=10,
+            filter_action="native",
+            sort_action="native",
+            style_table={"overflowX": "auto"},
+            style_cell={"textAlign": "center"},
+            style_header={"backgroundColor": "lightgrey", "fontWeight": "bold"},
+        ),
+    ]
+)
 
 
 @callback(
@@ -86,10 +94,9 @@ def update_graphs_range(range, currency):
     num_months = len(dates[start:end])
 
     df = create_expense_df(dfs, dates[start:end])
-
     df = df[df[CURRENCY_COLUMN] == currency]
 
-    # Line chart
+    # Bar chart
     df_bar = df.copy()
     df_bar[DATE_COLUMN] = df_bar[DATE_COLUMN].map(lambda d: d[:7])
     df_bar = df_bar.groupby([DATE_COLUMN, CATEGORY_COLUMN], as_index=False)[

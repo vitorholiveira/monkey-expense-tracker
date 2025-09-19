@@ -2,7 +2,7 @@ import dash_bootstrap_components as dbc
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
-from dash import Input, Output, callback, dash_table, dcc, html
+from dash import Input, Output, callback, dash_table, dcc, html, register_page
 
 from utils.app_functions import (
     create_amount_left_df,
@@ -18,61 +18,69 @@ from utils.config import (
     SUPPORTED_CURRENCIES,
 )
 
+# Register as a Dash page
+register_page(
+    __name__,
+    path="/monthly-spending",
+    name="Monthly Spending",
+    title="Monthly Spending",
+)
+
+# Load data
 dfs = load_csvs_to_dict(PATH_TO_EXPENSE_FILES_CURRENT)
 dates = sorted(list(dfs.keys()))
 
-
-def monthly_spending_page():
-    return dbc.Col(
-        [
-            html.H2("Monthly Spending"),
-            html.Br(),
-            dbc.Row(
-                [
-                    dbc.Col(
-                        [
-                            dbc.Label("Select a file to analyse:"),
-                            dcc.Dropdown(
-                                options=dates,
-                                value=dates[0] if len(dates) > 0 else None,
-                                id="dropdown-selection-date",
-                                clearable=False,
-                            ),
-                        ],
-                        width=6,
-                    ),
-                    dbc.Col(
-                        [
-                            dbc.Label("Select a currency for the analysis:"),
-                            dcc.Dropdown(
-                                options=SUPPORTED_CURRENCIES,
-                                value=DEFAULT_CURRENCY,
-                                id="dropdown-selection-currency-month",
-                                clearable=False,
-                            ),
-                        ],
-                        width=6,
-                    ),
-                ]
-            ),
-            dbc.Row(
-                [
-                    dbc.Col(dcc.Graph(id="bar-chart-month"), width=6),
-                    dbc.Col(dcc.Graph(id="pie-chart-month"), width=6),
-                ]
-            ),
-            html.Br(),
-            dash_table.DataTable(
-                id="expense-table-month",
-                page_size=10,
-                filter_action="native",
-                sort_action="native",
-                style_table={"overflowX": "auto"},
-                style_cell={"textAlign": "center"},
-                style_header={"backgroundColor": "lightgrey", "fontWeight": "bold"},
-            ),
-        ]
-    )
+# Layout definition
+layout = dbc.Col(
+    [
+        html.H2("Monthly Spending"),
+        html.Br(),
+        dbc.Row(
+            [
+                dbc.Col(
+                    [
+                        dbc.Label("Select a file to analyse:"),
+                        dcc.Dropdown(
+                            options=dates,
+                            value=dates[0] if len(dates) > 0 else None,
+                            id="dropdown-selection-date",
+                            clearable=False,
+                        ),
+                    ],
+                    width=6,
+                ),
+                dbc.Col(
+                    [
+                        dbc.Label("Select a currency for the analysis:"),
+                        dcc.Dropdown(
+                            options=SUPPORTED_CURRENCIES,
+                            value=DEFAULT_CURRENCY,
+                            id="dropdown-selection-currency-month",
+                            clearable=False,
+                        ),
+                    ],
+                    width=6,
+                ),
+            ]
+        ),
+        dbc.Row(
+            [
+                dbc.Col(dcc.Graph(id="bar-chart-month"), width=6),
+                dbc.Col(dcc.Graph(id="pie-chart-month"), width=6),
+            ]
+        ),
+        html.Br(),
+        dash_table.DataTable(
+            id="expense-table-month",
+            page_size=10,
+            filter_action="native",
+            sort_action="native",
+            style_table={"overflowX": "auto"},
+            style_cell={"textAlign": "center"},
+            style_header={"backgroundColor": "lightgrey", "fontWeight": "bold"},
+        ),
+    ]
+)
 
 
 @callback(
@@ -91,10 +99,9 @@ def update_graphs_month(date, currency):
         return empty_fig, empty_fig, [], []
 
     df = dfs[date].copy()
-
     df = df[df[CURRENCY_COLUMN] == currency]
 
-    # Line chart
+    # Bar chart
     df_bar = df.groupby([DATE_COLUMN, CATEGORY_COLUMN], as_index=False)[
         AMOUNT_COLUMN
     ].sum()
