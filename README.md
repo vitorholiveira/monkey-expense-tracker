@@ -1,4 +1,4 @@
-# Expense Tracker
+# Monkey Expense Tracker
 
 I developed this project to better control my expenses. The `main.py` script is designed to add new expenses to a CSV file that tracks all expenses for the month. The `utils/config` file has all the configuration constants that you can change if you'd like to customize the program.
 

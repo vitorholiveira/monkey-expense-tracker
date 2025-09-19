@@ -24,7 +24,7 @@ app.layout = dbc.Container(
             [
                 dcc.Link(
                     html.H1(
-                        "Expense Tracker",
+                        "Monkey Expense Tracker",
                         style={"textAlign": "center", "cursor": "pointer"},
                     ),
                     href="/",
