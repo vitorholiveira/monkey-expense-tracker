@@ -36,7 +36,7 @@ def main():
         default=1,
         required=False,
         type=float,
-        help="[OPTIONAL] The number of installments to pay.The default value is 1.",
+        help="[OPTIONAL] The number of installments to pay. The default value is 1.",
     )
     expense_parser.add_argument(
         "-c",
@@ -46,7 +46,7 @@ def main():
         choices=EXPENSE_CATEGORIES,
         type=str,
         help="[OPTIONAL] The category of the expense. The \
-              default value is defined in the `expense.py` file.",
+              default value is defined in the `utils/config.py` file.",
     )
     expense_parser.add_argument(
         "-d",
@@ -54,7 +54,7 @@ def main():
         default=DEFAULT_DESCRIPTION,
         type=str,
         help="[OPTIONAL] The description of the expense. The \
-              default value is defined in the `expense.py` file.",
+              default value is defined in the `utils/config.py` file.",
     )
     expense_parser.add_argument(
         "-cr",
@@ -62,7 +62,7 @@ def main():
         default=DEFAULT_CURRENCY,
         type=str,
         help="[OPTIONAL] The currency of the expense. The \
-              default value is defined in the `expense.py` file.",
+              default value is defined in the `utils/config.py` file.",
     )
     args = expense_parser.parse_args()
 
