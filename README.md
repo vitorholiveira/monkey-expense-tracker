@@ -16,9 +16,9 @@ This project requires a few steps to get started.
 
 Expense data is stored in CSV files located in the `expense_files/current/` folder. Each month has its own dedicated file, named `expense_YYYY-MM.csv`.
 
-When a new expense is added, it is appended as a new line in the CSV file. This new file then overwrites the previous version, while a backup of the current file is saved. Backups are stored in a dedicated directory for each month, located at `expense_files/backup/YYYY-MM/`. These backup files follow the naming convention `expense_YYYY-MM-DD_HH:MM:SS.csv`.
+When a new expense is added, it is appended as a new line in the CSV file. This new file then overwrites the previous version, while a backup of the current file is saved. Backups are stored in a dedicated directory for each month, located at `expense_files/current/backup/YYYY-MM/`. These backup files follow the naming convention `backup_YYYY-MM-DD_HH:MM:SS.csv`.
 
-An alternative storage method is available for development mode. By setting the `DEVELOPING` constant to `True` in `utils/config.py`, files will be stored as `dev_YYYY-MM.csv` in the `expanse_files/dev` directory, and the backup logic will be disabled. When `DEVELOPING` is `False`, the data is stored using the default method, including backups.
+An alternative storage method is available for development mode. By setting the `DEVELOPING` constant to `True` in `utils/config.py`, files will be stored as `dev_YYYY-MM.csv` in the `expanse_files/dev/` directory and the backup files will be stored at `expanse_files/dev/backup/`. When `DEVELOPING` is `False`, the data is stored using the default method.
 
 ## How installments are implemented
 

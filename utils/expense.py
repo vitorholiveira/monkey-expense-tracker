@@ -16,8 +16,9 @@ from utils.config import (
     DEVELOPING,
     NAME_COLUMN,
     PATH_TO_EXPENSE_FILES,
-    PATH_TO_EXPENSE_FILES_BACKUP,
+    PATH_TO_EXPENSE_FILES_CURRENT_BACKUP,
     SUPPORTED_CURRENCIES,
+    PATH_TO_EXPENSE_FILES_DEV_BACKUP,
 )
 from utils.functions import get_income
 
@@ -48,9 +49,6 @@ class Expense:
         )
 
     def _calculate_amount_left(self):
-        if self.expense_df.empty:
-            print("error")
-            return
         for currency in SUPPORTED_CURRENCIES:
             date_curr = self.date[self.installment_count].strftime("%Y-%m")
             income = get_income(date=date_curr, currency=currency)
@@ -66,26 +64,15 @@ class Expense:
             amount_left = income - total_amount_expended
             print(f"\n==> You have {currency} {amount_left:.2f} left.")
 
-    def _get_filename(self, date: datetime) -> str:
-        if DEVELOPING is True:
-            filename = f"dev_{date.strftime('%Y-%m')}.csv"
-        else:
-            filename = f"expense_{date.strftime('%Y-%m')}.csv"
-        return filename
-
     def _update_installments(self):
-        self.installment_count += 1
         self.date.append(datetime.now() + relativedelta(months=self.installment_count))
         self.date[self.installment_count] = self.date[self.installment_count].replace(
             day=1, hour=0, minute=0, second=0, microsecond=0
         )
         self.new_row_expense_df[DATE_COLUMN] = self.date[self.installment_count]
-        expense_filename = self._get_filename(self.date[self.installment_count])
-        self.update_expense(expense_filename)
 
-    def _save_expense_df(self, expense_filename: Path, subdir: str) -> None:
-        os.makedirs(PATH_TO_EXPENSE_FILES / subdir, exist_ok=True)
-        expense_filepath = PATH_TO_EXPENSE_FILES / subdir / expense_filename
+    def _save_expense_df(self, expense_directory: Path, expense_filepath: Path) -> None:
+        os.makedirs(expense_directory, exist_ok=True)
         if not os.path.exists(expense_filepath):
             self.expense_df = self.new_row_expense_df
         else:
@@ -95,13 +82,13 @@ class Expense:
             )
         self.expense_df.to_csv(expense_filepath, index=False)
 
-    def _save_backup(self, subdir_backup: str) -> None:
-        os.makedirs(PATH_TO_EXPENSE_FILES_BACKUP / subdir_backup, exist_ok=True)
+    def _save_backup(self, backup_directory: str) -> None:
+        os.makedirs(backup_directory, exist_ok=True)
         backup_expense_filename = (
-            f"expense_{datetime.now().strftime('%Y-%m-%d_%H:%M:%S')}.csv"
+            f"backup_{datetime.now().strftime('%Y-%m-%d_%H:%M:%S')}.csv"
         )
         backup_expense_filepath = (
-            PATH_TO_EXPENSE_FILES_BACKUP / subdir_backup / backup_expense_filename
+            backup_directory / backup_expense_filename
         )
         self.expense_df.to_csv(backup_expense_filepath, index=False)
 
@@ -116,23 +103,29 @@ class Expense:
             "==================================================================================================================\n"
         )
 
-    def update_expense(self, expense_filename: Optional[Path] = None) -> pd.DataFrame:
-        expense_filename = self._get_filename(self.date[self.installment_count])
+    def update_expense(self) -> pd.DataFrame:
+        backup_subdir = self.date[self.installment_count].strftime("%Y-%m")
         if DEVELOPING is False:
-            subdir_backup = self.date[self.installment_count].strftime("%Y-%m")
-            subdir = "current"
+            expense_filename = f"expense_{self.date[self.installment_count].strftime('%Y-%m')}.csv"
+            expense_subdir = "current"
+            backup_directory = PATH_TO_EXPENSE_FILES_CURRENT_BACKUP / backup_subdir
         else:
-            subdir = "dev"
+            expense_filename = f"dev_{self.date[self.installment_count].strftime('%Y-%m')}.csv"
+            expense_subdir = "dev"
+            backup_directory = PATH_TO_EXPENSE_FILES_DEV_BACKUP / backup_subdir
+        expense_directory = PATH_TO_EXPENSE_FILES / expense_subdir 
+        expense_filepath = expense_directory / expense_filename
 
-        self._save_expense_df(expense_filename, subdir)
+        self._save_expense_df(expense_directory, expense_filepath)
 
-        if DEVELOPING is False:
-            self._save_backup(subdir_backup)
+        self._save_backup(backup_directory)
 
-        self._print_info(PATH_TO_EXPENSE_FILES / subdir / expense_filename)
+        self._print_info(expense_filepath)
 
         # Recursively update installments
         if self.installment_count < self.installments - 1:
+            self.installment_count += 1
             self._update_installments()
+            self.update_expense()
 
         return self.expense_df
