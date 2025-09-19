@@ -1,6 +1,6 @@
 from pathlib import Path
 
-DEVELOPING = True
+DEVELOPING = False
 
 EXPENSE_CATEGORIES = [
     "SPORTS",
