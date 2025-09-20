@@ -1,10 +1,10 @@
 import dash_bootstrap_components as dbc
 from dash import Dash, dcc, html, page_container
 
-from utils.config import (
+from core.config import (
     PATH_TO_EXPENSE_FILES_CURRENT,
 )
-from utils.functions import (
+from core.utils import (
     load_csvs_to_dict,
 )
 

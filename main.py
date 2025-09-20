@@ -1,12 +1,12 @@
 import argparse
 
-from utils.config import (
+from core.config import (
     DEFAULT_CATEGORY,
     DEFAULT_CURRENCY,
     DEFAULT_DESCRIPTION,
     EXPENSE_CATEGORIES,
 )
-from utils.expense import Expense
+from core.expense import Expense
 
 
 def main():

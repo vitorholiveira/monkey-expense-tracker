@@ -6,7 +6,7 @@ from typing import Optional
 import pandas as pd
 from dateutil.relativedelta import relativedelta
 
-from utils.config import (
+from core.config import (
     AMOUNT_COLUMN,
     CATEGORY_COLUMN,
     CURRENCY_COLUMN,

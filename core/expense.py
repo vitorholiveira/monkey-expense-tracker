@@ -6,7 +6,7 @@ from pathlib import Path
 import pandas as pd
 from dateutil.relativedelta import relativedelta
 
-from utils.config import (
+from core.config import (
     AMOUNT_COLUMN,
     CATEGORY_COLUMN,
     CURRENCY_COLUMN,
@@ -19,7 +19,7 @@ from utils.config import (
     PATH_TO_EXPENSE_FILES_DEV_BACKUP,
     SUPPORTED_CURRENCIES,
 )
-from utils.functions import get_income
+from core.utils import get_income
 
 
 @dataclass
