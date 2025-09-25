@@ -62,8 +62,8 @@ layout = dbc.Col(
         dbc.Row(dbc.Col(dcc.Graph(id="line-chart-range"))),
         dbc.Row(
             [
-                dbc.Col(dcc.Graph(id="bar-chart-range"), width=6),
-                dbc.Col(dcc.Graph(id="pie-chart-range"), width=6),
+                dbc.Col(dcc.Graph(id="bar-chart-range"), width=8),
+                dbc.Col(dcc.Graph(id="pie-chart-range"), width=4),
             ]
         ),
         html.Br(),

@@ -37,6 +37,14 @@ layout = dbc.Col(
         html.Br(),
         dbc.Row(
             [
+                                
+                dbc.Col(
+                [
+                    html.Div(id="amount-left-display"),
+                ],
+                width=2,
+                style={"display": "flex", "flexDirection": "column", "justifyContent": "center"},
+            ),
                 dbc.Col(
                     [
                         dbc.Label("Select a file to analyse:"),
@@ -47,7 +55,8 @@ layout = dbc.Col(
                             clearable=False,
                         ),
                     ],
-                    width=6,
+                    width=5,
+                    style={"display": "flex", "flexDirection": "column", "justifyContent": "center"},
                 ),
                 dbc.Col(
                     [
@@ -59,15 +68,19 @@ layout = dbc.Col(
                             clearable=False,
                         ),
                     ],
-                    width=6,
+                    width=5,
+                    style={"display": "flex", "flexDirection": "column", "justifyContent": "center"},
                 ),
             ]
         ),
+        dbc.Row([
+            dbc.Col(dcc.Graph(id="line-chart-month"), width=10),
+        ]),
         dbc.Row(
             [
-                dbc.Col(dcc.Graph(id="bar-chart-month"), width=6),
-                dbc.Col(dcc.Graph(id="pie-chart-month"), width=6),
-            ]
+                dbc.Col(dcc.Graph(id="bar-chart-month"), width=8),
+                dbc.Col(dcc.Graph(id="pie-chart-month"), width=4),
+            ],
         ),
         html.Br(),
         dash_table.DataTable(
@@ -84,10 +97,12 @@ layout = dbc.Col(
 
 
 @callback(
+    Output("line-chart-month", "figure"),
     Output("bar-chart-month", "figure"),
     Output("pie-chart-month", "figure"),
     Output("expense-table-month", "data"),
     Output("expense-table-month", "columns"),
+    Output("amount-left-display", "children"),
     Input("dropdown-selection-date", "value"),
     Input("dropdown-selection-currency-month", "value"),
 )
@@ -96,19 +111,31 @@ def update_graphs_month(date, currency):
         empty_fig = go.Figure(
             layout={"title": "Please select a file from the dropdown above."}
         )
-        return empty_fig, empty_fig, [], []
+        return empty_fig, empty_fig, empty_fig, [], [], html.Div()
 
     df = dfs[date].copy()
     df = df[df[CURRENCY_COLUMN] == currency]
 
     # Bar chart
-    df_bar = df.groupby([DATE_COLUMN, CATEGORY_COLUMN], as_index=False)[
+    df_bar = df.copy()
+    df_bar[DATE_COLUMN] = df_bar[DATE_COLUMN].map(lambda d: d[:10])
+    df_bar = df_bar.groupby([DATE_COLUMN, CATEGORY_COLUMN], as_index=False)[
         AMOUNT_COLUMN
     ].sum()
-    bar_fig = px.bar(df_bar, x=DATE_COLUMN, y=AMOUNT_COLUMN, color=CATEGORY_COLUMN)
+    bar_fig = px.bar(df_bar, x=CATEGORY_COLUMN, y=AMOUNT_COLUMN, color=DATE_COLUMN)
 
-    # Pie chart
+    # Line chart
+    df_line = df.groupby([DATE_COLUMN, CATEGORY_COLUMN], as_index=False)[
+        AMOUNT_COLUMN
+    ].sum()
+    line_fig = px.line(
+        df_line, x=DATE_COLUMN, y=AMOUNT_COLUMN, color=CATEGORY_COLUMN, markers=True
+    )
+
+    # Get amount left information
     amount_left_df = create_amount_left_df(df, currency)
+    
+    # Pie chart
     df_pie = (
         pd.concat([df, amount_left_df], ignore_index=True)
         .groupby([CATEGORY_COLUMN], as_index=False)[AMOUNT_COLUMN]
@@ -118,8 +145,29 @@ def update_graphs_month(date, currency):
         df_pie, values=AMOUNT_COLUMN, names=CATEGORY_COLUMN, color=CATEGORY_COLUMN
     )
 
+    # Calculate total amount left
+    total_amount_left = amount_left_df[AMOUNT_COLUMN].sum() if not amount_left_df.empty else 0
+    
+    # Create amount left display with conditional coloring
+    amount_left_color = "success" if total_amount_left > 0 else "danger"
+    amount_left_icon = "+" if total_amount_left > 0 else ""
+    
+    amount_left_display = dbc.Card(
+        dbc.CardBody([
+            html.H4(
+                f"{amount_left_icon}{total_amount_left:.2f} {currency}",
+                className=f"text-{amount_left_color} text-center mb-1"
+            ),
+            html.P(
+                "Remaining Budget" if total_amount_left > 0 else "Over Budget",
+                className="text-muted text-center mb-0"
+            )
+        ]),
+        className=f"border-{amount_left_color}",
+    )
+
     # Table
     columns = [{"name": col, "id": col} for col in df.columns]
     data = df.to_dict("records")
 
-    return bar_fig, pie_fig, data, columns
+    return line_fig, bar_fig, pie_fig, data, columns, amount_left_display
